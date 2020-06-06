@@ -1,4 +1,4 @@
-from ..stats import share
+from ..maths import share
 import numpy as np
 import pytest
 
