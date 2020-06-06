@@ -27,7 +27,11 @@ def single_donation(donees, total_donation, split):
     :returns: Dictionary of each donee and their donation amount.
     :rtype: :class:`collections.Counter`
     """
-    assert total_donation % split == 0
+    if total_donation % split != 0:
+        raise ValueError(
+            f"The donation split {split} does not equally divide the total"
+            f"donation amount {total_donation}."
+            )
 
     individual_donation = total_donation // split
 

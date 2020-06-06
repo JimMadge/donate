@@ -32,3 +32,8 @@ class TestSingleDonation:
         selected_donees = single_donation(donees, 20, 4)
         assert sum(selected_donees.values()) == 20
         assert len(selected_donees) <= 4
+
+    def test_non_divisable(self, donees):
+        with pytest.raises(ValueError) as e:
+            single_donation(donees, 10, 3)
+        assert f"The donation split {3}" in str(e.value)
