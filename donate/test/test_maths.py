@@ -1,4 +1,4 @@
-from ..maths import share
+from ..maths import share, single_donation
 import numpy as np
 import pytest
 
@@ -20,3 +20,15 @@ def test_share_total(example_shares):
     ])
 def test_share(example_shares, number, share):
     assert np.isclose(example_shares[number], share)
+
+
+class TestSingleDonation:
+    def test_single_split(self, donees):
+        selected_donees = single_donation(donees, 20, 1)
+        assert sum(selected_donees.values()) == 20
+        assert len(selected_donees) == 1
+
+    def test_multiple_split(self, donees):
+        selected_donees = single_donation(donees, 20, 4)
+        assert sum(selected_donees.values()) == 20
+        assert len(selected_donees) <= 4
