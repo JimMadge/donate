@@ -1,4 +1,5 @@
 from ..configuration import parse_config, _required_keys, ConfigurationError
+from ..donee import Donee, Type, Weight
 from textwrap import dedent
 import pytest
 
@@ -14,7 +15,7 @@ class TestParseYAML:
         donees:
           - name: Favourite distro
             weight: critical
-            type: disbribution
+            type: distribution
             url: distro.com
           - name: Favourite software
             weight: large
@@ -26,6 +27,18 @@ class TestParseYAML:
         config = parse_config(self.yaml_string)
         assert config["total_donation"] == 20
         assert len(config["donees"]) == 2
+
+    def test_donees(self):
+        config = parse_config(self.yaml_string)
+        assert type(config["donees"][0]) is Donee
+
+        expected_donee = Donee(
+            name="Favourite distro",
+            weight=Weight.CRITICAL,
+            donee_type=Type.DISTRIBUTION,
+            donation_url="distro.com"
+            )
+        assert config["donees"][0] == expected_donee
 
     @pytest.mark.parametrize("key", _required_keys)
     def test_missing_key(self, key):

@@ -1,16 +1,32 @@
 """Configuration parsing."""
+from .donee import Donee, Type, Weight
 from yaml import load
 
 _required_keys = ["total_donation", "split", "donees"]
 
+_type_map = {
+    "software": Type.SOFTWARE,
+    "distribution": Type.DISTRIBUTION,
+    "podcast": Type.PODCAST,
+    "organisation": Type.ORGANISATION,
+    "other": Type.OTHER
+    }
 
-def parse_config(yaml_string):
+_weight_map = {
+    "critical": Weight.CRITICAL,
+    "large": Weight.LARGE,
+    "medium": Weight.MEDIUM,
+    "small": Weight.SMALL
+    }
+
+
+def parse_config(config_yaml):
     try:
         from yaml import CLoader as Loader
     except ImportError:
         from yaml import Loader
 
-    config = load(yaml_string, Loader)
+    config = load(config_yaml, Loader)
 
     keys = config.keys()
 
@@ -30,7 +46,22 @@ def parse_config(yaml_string):
     except KeyError:
         pass
 
+    # Process donees
+    donees = []
+    for donee_dict in config["donees"]:
+        donees.append(parse_donee(donee_dict))
+    config["donees"] = donees
+
     return config
+
+
+def parse_donee(donee_dict):
+    return Donee(
+        name=donee_dict["name"],
+        weight=_weight_map[donee_dict["weight"].lower()],
+        donee_type=_type_map[donee_dict["type"].lower()],
+        donation_url=donee_dict["url"]
+        )
 
 
 class ConfigurationError(Exception):
