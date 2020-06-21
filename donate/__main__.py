@@ -36,10 +36,16 @@ def main():
     total_donation = config["total_donation"]
     split = config["split"]
     currency_symbol = config["currency_symbol"]
+    decimal_currency = config["decimal_currency"]
 
     # Get individual donations
-    individual_donations = single_donation(donees, total_donation, split)
+    individual_donations = single_donation(donees, total_donation, split,
+                                           decimal_currency)
     for donee, amount in individual_donations.items():
+        if decimal_currency:
+            whole = amount//100
+            hundreths = amount%100
+            amount = f"{whole}.{hundreths:02d}"
         print(f"{donee.name} -- {currency_symbol}{amount} -->"
               f" {donee.donation_url}")
 

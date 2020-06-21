@@ -46,7 +46,7 @@ def parse_config(config_yaml):
         if type(config["decimal_currency"]) is not bool:
             raise ConfigurationError("'decimal_currency' must be a boolean")
     except KeyError:
-        pass
+        config["decimal_currency"] = False
 
     # Set currency if one is not declared symbol
     if "currency_symbol" not in keys:
