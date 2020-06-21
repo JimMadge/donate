@@ -51,13 +51,13 @@ def parse_config(config_yaml):
     # Process donees
     donees = []
     for donee_dict in config["donees"]:
-        donees.append(parse_donee(donee_dict))
+        donees.append(_parse_donee(donee_dict))
     config["donees"] = donees
 
     return config
 
 
-def parse_donee(donee_dict):
+def _parse_donee(donee_dict):
     return Donee(
         name=donee_dict["name"],
         weight=_weight_map[donee_dict["weight"].lower()],
