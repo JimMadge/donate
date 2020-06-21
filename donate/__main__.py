@@ -43,8 +43,8 @@ def main():
                                            decimal_currency)
     for donee, amount in individual_donations.items():
         if decimal_currency:
-            whole = amount//100
-            hundreths = amount%100
+            whole = amount // 100
+            hundreths = amount % 100
             amount = f"{whole}.{hundreths:02d}"
         print(f"{donee.name} -- {currency_symbol}{amount} -->"
               f" {donee.donation_url}")
