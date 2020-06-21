@@ -35,11 +35,13 @@ def main():
     donees = config["donees"]
     total_donation = config["total_donation"]
     split = config["split"]
+    currency_symbol = config["currency_symbol"]
 
     # Get individual donations
     individual_donations = single_donation(donees, total_donation, split)
     for donee, amount in individual_donations.items():
-        print(f"{donee.name} -- £{amount} --> {donee.donation_url}")
+        print(f"{donee.name} -- {currency_symbol}{amount} -->"
+              f" {donee.donation_url}")
 
 
 if __name__ == "__main__":

@@ -48,6 +48,10 @@ def parse_config(config_yaml):
     except KeyError:
         pass
 
+    # Set currency if one is not declared symbol
+    if "currency_symbol" not in keys:
+        config["currency_symbol"] = "£"
+
     # Process donees
     donees = []
     for donee_dict in config["donees"]:
