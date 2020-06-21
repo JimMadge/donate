@@ -39,8 +39,8 @@ def single_donation(donees, total_donation, split):
         donees[i] for i in choice(len(donees), split, p=share(donees))
         ]
 
-    selected_donees = Counter()
+    individual_donations = Counter()
     for donee in choices:
-        selected_donees[donee] += individual_donation
+        individual_donations[donee] += individual_donation
 
-    return selected_donees
+    return individual_donations

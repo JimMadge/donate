@@ -24,14 +24,14 @@ def test_share(example_shares, number, share):
 
 class TestSingleDonation:
     def test_single_split(self, donees):
-        selected_donees = single_donation(donees, 20, 1)
-        assert sum(selected_donees.values()) == 20
-        assert len(selected_donees) == 1
+        individual_donations = single_donation(donees, 20, 1)
+        assert sum(individual_donations.values()) == 20
+        assert len(individual_donations) == 1
 
     def test_multiple_split(self, donees):
-        selected_donees = single_donation(donees, 20, 4)
-        assert sum(selected_donees.values()) == 20
-        assert len(selected_donees) <= 4
+        individual_donations = single_donation(donees, 20, 4)
+        assert sum(individual_donations.values()) == 20
+        assert len(individual_donations) <= 4
 
     def test_non_divisable(self, donees):
         with pytest.raises(ValueError) as e:
