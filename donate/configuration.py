@@ -7,8 +7,10 @@ _required_keys = ["total_donation", "split", "donees"]
 _type_map = {
     "software": Type.SOFTWARE,
     "distribution": Type.DISTRIBUTION,
+    "service": Type.SERVICE,
     "podcast": Type.PODCAST,
     "organisation": Type.ORGANISATION,
+    "charity": Type.CHARITY,
     "other": Type.OTHER
     }
 

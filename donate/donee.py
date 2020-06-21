@@ -17,8 +17,10 @@ class Type(Enum):
 
     SOFTWARE = auto
     DISTRIBUTION = auto
+    SERVICE = auto
     PODCAST = auto
     ORGANISATION = auto
+    CHARITY = auto
     OTHER = auto
 
 
