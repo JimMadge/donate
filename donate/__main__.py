@@ -51,8 +51,9 @@ def main():
               f" {donee.donation_url}")
 
     # Write record of donation date
-    with open("last_donation", "w") as date_file:
-        date_file.write(datetime.today().isoformat())
+    if not args.dry_run:
+        with open("last_donation", "w") as date_file:
+            date_file.write(datetime.today().isoformat())
 
 
 if __name__ == "__main__":
