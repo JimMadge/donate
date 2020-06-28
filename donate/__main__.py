@@ -1,6 +1,7 @@
 from .configuration import parse_config
 from .maths import single_donation
 import argparse
+from datetime import datetime
 
 
 def main():
@@ -48,6 +49,10 @@ def main():
             amount = f"{whole}.{hundreths:02d}"
         print(f"{donee.name} -- {currency_symbol}{amount} -->"
               f" {donee.donation_url}")
+
+    # Write record of donation date
+    with open("last_donation", "w") as date_file:
+        date_file.write(datetime.today().isoformat())
 
 
 if __name__ == "__main__":
