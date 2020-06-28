@@ -41,6 +41,15 @@ def main():
     currency_symbol = config["currency_symbol"]
     decimal_currency = config["decimal_currency"]
 
+    # Read last donation
+    try:
+        with open(_last_donation_file) as date_file:
+            last_donation = datetime.fromisoformat(date_file.read())
+        first_donation = False
+    except FileNotFoundError:
+        last_donation = None
+        first_donation = True
+
     # Get individual donations
     individual_donations = single_donation(donees, total_donation, split,
                                            decimal_currency)
