@@ -40,6 +40,7 @@ def main():
     split = config["split"]
     currency_symbol = config["currency_symbol"]
     decimal_currency = config["decimal_currency"]
+    schedule = config["schedule"]
 
     # Read last donation
     try:
@@ -47,11 +48,26 @@ def main():
             last_donation = datetime.fromisoformat(date_file.read().strip())
     except FileNotFoundError:
         last_donation = None
-        first_donation = True
+
+    # Determine number of donations due
+    if last_donation:
+        due_donations = schedule.due_donations(last_donation)
+    else:
+        due_donations = 1
+
+    if due_donations == 0:
+        print("No donations due")
+        return
+    else:
+        print(f"{due_donations} donations due")
 
     # Get individual donations
-    individual_donations = single_donation(donees, total_donation, split,
-                                           decimal_currency)
+    individual_donations = single_donation(
+        donees,
+        total_donation * due_donations,
+        split * due_donations,
+        decimal_currency
+        )
     for donee, amount in individual_donations.items():
         if decimal_currency:
             whole = amount // 100

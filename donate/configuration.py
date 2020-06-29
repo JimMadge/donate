@@ -1,5 +1,6 @@
 """Configuration parsing."""
 from .donee import Donee, Type, Weight
+from .schedule import AdHoc, Monthly
 from yaml import load
 
 _required_keys = ["total_donation", "split", "donees"]
@@ -21,6 +22,11 @@ _weight_map = {
     "small": Weight.SMALL
     }
 
+_schedule_map = {
+    "ad-hoc": AdHoc,
+    "monthly": Monthly
+    }
+
 
 def parse_config(config_yaml):
     try:
@@ -37,10 +43,6 @@ def parse_config(config_yaml):
         if key not in keys:
             raise ConfigurationError(f"Required key '{key}' not declared")
 
-    # Ensure donees is a list
-    if type(config["donees"]) is not list:
-        raise ConfigurationError("Donees must be a list")
-
     # Ensure decimal currency is a boolean value if present
     try:
         if type(config["decimal_currency"]) is not bool:
@@ -51,6 +53,21 @@ def parse_config(config_yaml):
     # Set currency if one is not declared symbol
     if "currency_symbol" not in keys:
         config["currency_symbol"] = "£"
+
+    # Set schedule
+    if "schedule" not in keys:
+        config["schedule"] = AdHoc()
+    else:
+        if config["schedule"] not in _schedule_map.keys():
+            raise ConfigurationError(
+                f"Schedule must be one of '{', '.join(_schedule_map.keys())}'"
+                )
+
+        config["schedule"] = _schedule_map[config["schedule"]]()
+
+    # Ensure donees is a list
+    if type(config["donees"]) is not list:
+        raise ConfigurationError("Donees must be a list")
 
     # Process donees
     donees = []
