@@ -1,5 +1,6 @@
 from .configuration import parse_config
 from .maths import single_donation
+from .schedule import AdHoc
 import argparse
 from datetime import datetime
 
@@ -55,11 +56,12 @@ def main():
     else:
         due_donations = 1
 
-    if due_donations == 0:
-        print("No donations due")
-        return
-    else:
-        print(f"{due_donations} donations due")
+    if not isinstance(schedule, AdHoc):
+        if due_donations == 0:
+            print("No donations due")
+            return
+        else:
+            print(f"{due_donations} donations due")
 
     # Get individual donations
     individual_donations = single_donation(
