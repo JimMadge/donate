@@ -23,7 +23,7 @@ _weight_map = {
     }
 
 _schedule_map = {
-    "ad-hoc": AdHoc,
+    "ad hoc": AdHoc,
     "monthly": Monthly
     }
 
