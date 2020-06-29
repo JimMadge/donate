@@ -44,8 +44,7 @@ def main():
     # Read last donation
     try:
         with open(_last_donation_file) as date_file:
-            last_donation = datetime.fromisoformat(date_file.read())
-        first_donation = False
+            last_donation = datetime.fromisoformat(date_file.read().strip())
     except FileNotFoundError:
         last_donation = None
         first_donation = True
