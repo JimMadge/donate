@@ -81,7 +81,7 @@ def main():
     # Write record of donation date
     if not args.dry_run:
         with open(_last_donation_file, "w") as date_file:
-            date_file.write(datetime.today().isoformat())
+            date_file.write(datetime.today().isoformat()+"\n")
 
 
 if __name__ == "__main__":
