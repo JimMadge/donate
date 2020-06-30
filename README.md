@@ -29,11 +29,11 @@ Donate lets the user set,
 This ensure that the user can donate an amount they are happy with, weighted
 as they like and that the individual donations will be significant.
 
-## Problems
+## New Problems
 
 This system is certainly not perfect. Here are some problems I can see,
 
 - Making donations requires discipline and manual intervention, unlike services
   like [Liberapay](https://liberapay.com/)
-- The amounts and regularity at which projects will receive donations in
+- The amounts and regularity at which projects will receive donations is
   unpredictable which could make their financial planning more difficult
