@@ -41,4 +41,45 @@ This system is certainly not perfect. Here are some problems I can see,
 
 ## Installation
 
+...
+
 ## Usage
+### Configuration
+
+Donate needs to be configured before use Donate is configured with a single
+[YAML](https://yaml.org/) file. This files path should be
+`$XDG_CONFIG_HOME/donate/config.yml` (generally `~/.config/donate/config.yml`).
+
+The configuration file has the following top level keys
+
+| key                | description                                        | required | default  |
+| ---                | ---                                                | ---      | ---      |
+| `total_donation`   | Total amount to donate                             | yes      |          |
+| `split`            | How  many donees to split `total_donation` between | yes      |          |
+| `schedule`         | Donation schedule, one of `ad hoc` and `monthly`   | no       | `ad hoc` |
+| `currency_symbol`  | Symbol of the currency of `total_donation`         | no       | `£`      |
+| `decimal_currency` | Whether the currency can be split into hundredths  | no       | `false`  |
+| `donees`           | List of donees                                     | yes      |          |
+
+Each donee requires the following keys
+
+| key      | description                                                                                                  |
+| ---      | ---                                                                                                          |
+| `name`   | Name of the donee                                                                                            |
+| `weight` | How to weight donations to this donee, one of `critical`, `large`, `medium` or `small`                       |
+| `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other` |
+| `url`    | Donation url of the donee                                                                                    |
+
+### Command Line
+
+To generate a set of donations
+
+```
+$ donate
+```
+
+To see more command line options
+
+```
+$ donate -h
+```
