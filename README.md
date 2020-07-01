@@ -3,7 +3,8 @@
 Generate donations to projects you want to support according to a distribution
 you control.
 
-## The Problem
+## About
+### The Problem
 
 I want to donate to many (mostly software) projects which I like, use or depend
 on. This creates a tension between what donation strategy would suit me and what
@@ -16,7 +17,7 @@ receive a tiny amount and loose (proportionally) more of my contributions
 through payment-service and currency transactions fees. Also, I may value some
 projects more than others and want them to receive a greater share.
 
-## A Possible Solution
+### A Possible Solution
 
 Donate lets the user set,
 
@@ -29,7 +30,7 @@ Donate lets the user set,
 This ensure that the user can donate an amount they are happy with, weighted
 as they like and that the individual donations will be significant.
 
-## New Problems
+### New Problems
 
 This system is certainly not perfect. Here are some problems I can see,
 
@@ -37,3 +38,7 @@ This system is certainly not perfect. Here are some problems I can see,
   like [Liberapay](https://liberapay.com/)
 - The amounts and regularity at which projects will receive donations is
   unpredictable which could make their financial planning more difficult
+
+## Installation
+
+## Usage
