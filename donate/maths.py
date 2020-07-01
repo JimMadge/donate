@@ -1,16 +1,13 @@
 """Mathematical and statistical operations."""
 from collections import Counter
-import numpy as np
 from random import choices
 
 
 def share(donees):
     """Calculate the share of each donee."""
-    shares = np.empty(len(donees))
-
-    for i, donee in enumerate(donees):
-        shares[i] = donee.weight.value
-    shares /= shares.sum()
+    shares = [donee.weight.value for donee in donees]
+    total = sum(shares)
+    shares = [share / total for share in shares]
 
     return shares
 

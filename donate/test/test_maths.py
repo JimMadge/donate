@@ -8,7 +8,7 @@ def example_shares(donees):
 
 
 def test_share_total(example_shares):
-    assert example_shares.sum() == pytest.approx(1.0)
+    assert sum(example_shares) == pytest.approx(1.0)
 
 
 @pytest.mark.parametrize("number,share", [
