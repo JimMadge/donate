@@ -1,7 +1,7 @@
 """Mathematical and statistical operations."""
 from collections import Counter
 import numpy as np
-from numpy.random import choice
+from random import choices
 
 
 def share(donees):
@@ -42,12 +42,10 @@ def single_donation(donees, total_donation, split, decimal_currency=False):
 
     individual_donation = total_donation // split
 
-    choices = [
-        donees[i] for i in choice(len(donees), split, p=share(donees))
-        ]
+    selected = choices(donees, weights=share(donees), k=split)
 
     individual_donations = Counter()
-    for donee in choices:
+    for donee in selected:
         individual_donations[donee] += individual_donation
 
     return individual_donations
