@@ -26,7 +26,7 @@ def main():
         action="store_true",
         help=(
             "Generate sample donations but don't commit them to the donations"
-            " record"
+            " record or update the last donation time."
             )
         )
 
