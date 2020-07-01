@@ -69,6 +69,30 @@ Each donee requires the following keys
 | `weight` | How to weight donations to this donee, one of `critical`, `large`, `medium` or `small`                       |
 | `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other` |
 | `url`    | Donation url of the donee                                                                                    |
+Here is a short example
+```yaml
+---
+total_donation: 40
+split: 8
+schedule: monthly
+currency_symbol: £
+decimal_currency: true
+
+donees:
+  - name: Arch Linux
+    weight: critical
+    type: distribution
+    url: https://www.archlinux.org/donate/
+  - name: Kodi
+    weight: large
+    type: software
+    url: https://kodi.tv/contribute/donate
+  - name: Python Software Foundation
+    weight: large
+    type: organisation
+    url: https://www.python.org/psf/donations/
+...
+```
 
 ### Command Line
 
