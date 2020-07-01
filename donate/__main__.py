@@ -3,8 +3,7 @@ from .maths import single_donation
 from .schedule import AdHoc
 import argparse
 from datetime import datetime
-
-_last_donation_file = "last_donation"
+from xdg import BaseDirectory
 
 
 def main():
@@ -18,8 +17,7 @@ def main():
         "-c", "--config",
         action="store",
         type=str,
-        default="config.yml",
-        help="Path to the configuration YAML file, default: './config.yml'"
+        help="Specify a path to a non-default configuration file."
         )
     parser.add_argument(
         "-d", "--dry-run",
@@ -33,8 +31,18 @@ def main():
     # Get command line argumnets
     args = parser.parse_args()
 
-    # Read configuration file
-    with open(args.config, "r") as config_file:
+    # Get XDG configuration path
+    # This function has side effects; it ensures that the path exists
+    config_path = BaseDirectory.save_config_path("donate")
+
+    # Locate configuration file
+    if args.config:
+        config_file_path = args.config
+    else:
+        config_file_path = config_path + "/config.yml"
+
+    # Parse configuration file
+    with open(config_file_path, "r") as config_file:
         config = parse_config(config_file)
     donees = config["donees"]
     total_donation = config["total_donation"]
@@ -44,9 +52,12 @@ def main():
     schedule = config["schedule"]
 
     # Read last donation
+    last_donation_file_path = config_path + "/last_donation"
     try:
-        with open(_last_donation_file) as date_file:
-            last_donation = datetime.fromisoformat(date_file.read().strip())
+        with open(last_donation_file_path) as last_donation_file:
+            last_donation = datetime.fromisoformat(
+                    last_donation_file.read().strip()
+                    )
     except FileNotFoundError:
         last_donation = None
 
@@ -80,8 +91,8 @@ def main():
 
     # Write record of donation date
     if not args.dry_run:
-        with open(_last_donation_file, "w") as date_file:
-            date_file.write(datetime.today().isoformat()+"\n")
+        with open(last_donation_file_path, "w") as last_donation_file:
+            last_donation_file.write(datetime.today().isoformat()+"\n")
 
 
 if __name__ == "__main__":
