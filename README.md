@@ -69,7 +69,9 @@ Each donee requires the following keys
 | `weight` | How to weight donations to this donee, one of `critical`, `large`, `medium` or `small`                       |
 | `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other` |
 | `url`    | Donation url of the donee                                                                                    |
+
 Here is a short example
+
 ```yaml
 ---
 total_donation: 40
