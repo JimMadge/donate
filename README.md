@@ -63,15 +63,15 @@ Donate needs to be configured before use Donate is configured with a single
 
 The configuration file has the following top level keys
 
-| key                | description                                         | required | default  |
-| ---                | ---                                                 | ---      | ---      |
-| `total_donation`   | Total amount to donate                              | yes      |          |
-| `split`            | How  many donees to split `total_donation` between  | yes      |          |
-| `schedule`         | Donation schedule, one of `ad hoc` and `monthly`    | no       | `ad hoc` |
-| `currency_symbol`  | Symbol of the currency of `total_donation`          | no       | `£`      |
-| `decimal_currency` | Whether the currency can be split into hundredths   | no       | `false`  |
-| `weights`          | A set of user-declared, donation-frequency, weights | no       |          |
-| `donees`           | List of donees                                      | yes      |          |
+| key                | description                                        | required | default  |
+| ---                | ---                                                | ---      | ---      |
+| `total_donation`   | Total amount to donate                             | yes      |          |
+| `split`            | How  many donees to split `total_donation` between | yes      |          |
+| `schedule`         | Donation schedule, one of `ad hoc` and `monthly`   | no       | `ad hoc` |
+| `currency_symbol`  | Symbol of the currency of `total_donation`         | no       | `£`      |
+| `decimal_currency` | Whether the currency can be split into hundredths  | no       | `false`  |
+| `weights`          | A set of user-declared, donation weights           | no       |          |
+| `donees`           | List of donees                                     | yes      |          |
 
 Each donee requires the following keys
 

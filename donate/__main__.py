@@ -1,4 +1,5 @@
 from .configuration import parse_config
+from .ledger import update_ledger
 from .maths import single_donation
 from .schedule import AdHoc
 import argparse
@@ -24,7 +25,7 @@ def main():
         action="store_true",
         help=(
             "Generate sample donations but don't commit them to the donations"
-            " record or update the last donation time."
+            " ledger or update the last donation time."
             )
         )
 
@@ -89,10 +90,12 @@ def main():
         print(f"{donee.name} -- {currency_symbol}{amount} -->"
               f" {donee.donation_url}")
 
-    # Write record of donation date
+    # Write record of donation date and update ledger
     if not args.dry_run:
         with open(last_donation_file_path, "w") as last_donation_file:
             last_donation_file.write(datetime.today().isoformat()+"\n")
+
+        update_ledger(individual_donations, decimal_currency)
 
 
 if __name__ == "__main__":
