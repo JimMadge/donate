@@ -1,4 +1,5 @@
 from .configuration import parse_config
+from .ledger import update_ledger, print_ledger_stats
 from .maths import single_donation
 from .schedule import AdHoc
 import argparse
@@ -20,12 +21,26 @@ def main():
         help="Specify a path to a non-default configuration file."
         )
     parser.add_argument(
+        "-a", "--ad-hoc",
+        action="store_true",
+        help=(
+            "Make an ad hoc donation, i.e. ignore your donation schedule and"
+            " last donation date. Useful in combination with '--dry-run' for"
+            " testing."
+            )
+        )
+    parser.add_argument(
         "-d", "--dry-run",
         action="store_true",
         help=(
             "Generate sample donations but don't commit them to the donations"
-            " record or update the last donation time."
+            " ledger or update the last donation time."
             )
+        )
+    parser.add_argument(
+        "-s", "--stats",
+        action="store_true",
+        help="Print some statistics about previous donations."
         )
 
     # Get command line argumnets
@@ -51,15 +66,23 @@ def main():
     decimal_currency = config["decimal_currency"]
     schedule = config["schedule"]
 
+    # If the stats option has been declared, print statistics and exit
+    if args.stats:
+        print_ledger_stats(currency_symbol, decimal_currency)
+        return
+
     # Read last donation
-    last_donation_file_path = config_path + "/last_donation"
-    try:
-        with open(last_donation_file_path) as last_donation_file:
-            last_donation = datetime.fromisoformat(
-                    last_donation_file.read().strip()
-                    )
-    except FileNotFoundError:
+    if args.ad_hoc:
         last_donation = None
+    else:
+        last_donation_file_path = config_path + "/last_donation"
+        try:
+            with open(last_donation_file_path) as last_donation_file:
+                last_donation = datetime.fromisoformat(
+                        last_donation_file.read().strip()
+                        )
+        except FileNotFoundError:
+            last_donation = None
 
     # Determine number of donations due
     if last_donation:
@@ -89,10 +112,13 @@ def main():
         print(f"{donee.name} -- {currency_symbol}{amount} -->"
               f" {donee.donation_url}")
 
-    # Write record of donation date
+    # Write record of donation date and update ledger
     if not args.dry_run:
-        with open(last_donation_file_path, "w") as last_donation_file:
-            last_donation_file.write(datetime.today().isoformat()+"\n")
+        if not args.ad_hoc:
+            with open(last_donation_file_path, "w") as last_donation_file:
+                last_donation_file.write(datetime.today().isoformat()+"\n")
+
+        update_ledger(individual_donations, decimal_currency)
 
 
 if __name__ == "__main__":
