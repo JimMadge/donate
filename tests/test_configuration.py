@@ -1,7 +1,7 @@
 from donate.configuration import (
     parse_config, _required_keys, ConfigurationError
     )
-from donate.donee import Donee, Type, Weight
+from donate.donee import Donee, Type
 from textwrap import dedent
 import pytest
 
@@ -13,6 +13,12 @@ class TestParseYAML:
         split: 4
         currency_symbol: £
         decimal_currency: true
+
+        weights:
+          critical: 1.0
+          large: 0.5
+          medium: 0.25
+          small: 0.1
 
         donees:
           - name: Favourite distro
@@ -36,7 +42,7 @@ class TestParseYAML:
 
         expected_donee = Donee(
             name="Favourite distro",
-            weight=Weight.CRITICAL.value,
+            weight=1.0,
             donee_type=Type.DISTRIBUTION,
             donation_url="distro.com"
             )

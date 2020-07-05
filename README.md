@@ -70,16 +70,17 @@ The configuration file has the following top level keys
 | `schedule`         | Donation schedule, one of `ad hoc` and `monthly`   | no       | `ad hoc` |
 | `currency_symbol`  | Symbol of the currency of `total_donation`         | no       | `£`      |
 | `decimal_currency` | Whether the currency can be split into hundredths  | no       | `false`  |
+| `weights`          | A set of user-declared donation frequency weights  | no       |          |
 | `donees`           | List of donees                                     | yes      |          |
 
 Each donee requires the following keys
 
-| key      | description                                                                                                                |
-| ---      | ---                                                                                                                        |
-| `name`   | Name of the donee                                                                                                          |
-| `weight` | Relative weight of donation frequency to this donee, one of `critical`, `large`, `medium`, `small`, or an arbitrary number |
-| `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other`               |
-| `url`    | Donation url of the donee                                                                                                  |
+| key      | description                                                                                                        |
+| ---      | ---                                                                                                                |
+| `name`   | Name of the donee                                                                                                  |
+| `weight` | Relative weight of donation frequency to this donee, this may be a weight declared in `weights` or any real number |
+| `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other`       |
+| `url`    | Donation url of the donee                                                                                          |
 
 Here is a short example
 
@@ -90,6 +91,12 @@ split: 8
 schedule: monthly
 currency_symbol: £
 decimal_currency: true
+
+weights:
+  critical: 1.0
+  large: 0.5
+  normal: 0.25
+  small: 0.1
 
 donees:
   - name: Arch Linux
