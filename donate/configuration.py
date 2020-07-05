@@ -79,9 +79,18 @@ def parse_config(config_yaml):
 
 
 def _parse_donee(donee_dict):
+    # Process weight argument
+    weight = donee_dict["weight"]
+    if (weight_type := type(weight)) is str:
+        weight = _weight_map[donee_dict["weight"].lower()].value
+    elif weight_type is int:
+        weight = float(weight)
+    elif weight_type is float:
+        weight = weight
+
     return Donee(
         name=donee_dict["name"],
-        weight=_weight_map[donee_dict["weight"].lower()],
+        weight=weight,
         donee_type=_type_map[donee_dict["type"].lower()],
         donation_url=donee_dict["url"]
         )

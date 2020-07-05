@@ -74,12 +74,12 @@ The configuration file has the following top level keys
 
 Each donee requires the following keys
 
-| key      | description                                                                                                  |
-| ---      | ---                                                                                                          |
-| `name`   | Name of the donee                                                                                            |
-| `weight` | How to weight donations to this donee, one of `critical`, `large`, `medium` or `small`                       |
-| `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other` |
-| `url`    | Donation url of the donee                                                                                    |
+| key      | description                                                                                                                |
+| ---      | ---                                                                                                                        |
+| `name`   | Name of the donee                                                                                                          |
+| `weight` | Relative weight of donation frequency to this donee, one of `critical`, `large`, `medium`, `small`, or an arbitrary number |
+| `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other`               |
+| `url`    | Donation url of the donee                                                                                                  |
 
 Here is a short example
 
@@ -97,7 +97,7 @@ donees:
     type: distribution
     url: https://www.archlinux.org/donate/
   - name: Kodi
-    weight: large
+    weight: 0.8
     type: software
     url: https://kodi.tv/contribute/donate
   - name: Python Software Foundation

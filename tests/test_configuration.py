@@ -36,7 +36,7 @@ class TestParseYAML:
 
         expected_donee = Donee(
             name="Favourite distro",
-            weight=Weight.CRITICAL,
+            weight=Weight.CRITICAL.value,
             donee_type=Type.DISTRIBUTION,
             donation_url="distro.com"
             )
