@@ -40,8 +40,18 @@ This system is certainly not perfect. Here are some problems I can see,
   unpredictable which could make their financial planning more difficult
 
 ## Installation
+### User Install Using Pip
 
-...
+Clone the repository
+```
+$ git clone https://github.com/JimMadge/donate.git
+```
+Install using pip
+```
+$ cd doante
+$ pip install --user .
+```
+Ensure `~/.local/bin` is in your `$PATH`.
 
 ## Usage
 ### Configuration
