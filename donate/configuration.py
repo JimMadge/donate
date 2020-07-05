@@ -1,5 +1,5 @@
 """Configuration parsing."""
-from .donee import Donee, Type, Weight
+from .donee import Donee, Type
 from .schedule import AdHoc, Monthly
 from yaml import load
 
@@ -13,13 +13,6 @@ _type_map = {
     "organisation": Type.ORGANISATION,
     "charity": Type.CHARITY,
     "other": Type.OTHER
-    }
-
-_weight_map = {
-    "critical": Weight.CRITICAL,
-    "large": Weight.LARGE,
-    "medium": Weight.MEDIUM,
-    "small": Weight.SMALL
     }
 
 _schedule_map = {
@@ -70,18 +63,44 @@ def parse_config(config_yaml):
         raise ConfigurationError("Donees must be a list")
 
     # Process donees
+    if "weights" in keys:
+        weight_dict = config["weights"]
+    else:
+        weight_dict = None
     donees = []
     for donee_dict in config["donees"]:
-        donees.append(_parse_donee(donee_dict))
+        donees.append(_parse_donee(donee_dict, weight_dict))
     config["donees"] = donees
 
     return config
 
 
-def _parse_donee(donee_dict):
+def _parse_donee(donee_dict, weight_dict):
+    # Process weight argument
+    weight = donee_dict["weight"]
+    if (weight_type := type(weight)) is str:
+        # If weight is a string, ensure weight keywords have been declared
+        if weight_dict is None:
+            raise ConfigurationError(
+                f"The weight of donee '{donee_dict['name']}' is a string, but"
+                " no weights have been defined."
+                )
+
+        try:
+            weight = weight_dict[weight]
+        except KeyError:
+            raise ConfigurationError(
+                f"Weight '{weight}' of donee '{donee_dict['name']}' not"
+                " defined"
+                )
+    elif weight_type is int:
+        weight = float(weight)
+    elif weight_type is float:
+        weight = weight
+
     return Donee(
         name=donee_dict["name"],
-        weight=_weight_map[donee_dict["weight"].lower()],
+        weight=weight,
         donee_type=_type_map[donee_dict["type"].lower()],
         donation_url=donee_dict["url"]
         )

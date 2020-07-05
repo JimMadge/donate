@@ -5,7 +5,7 @@ from random import choices
 
 def share(donees):
     """Calculate the share of each donee."""
-    shares = [donee.weight.value for donee in donees]
+    shares = [donee.weight for donee in donees]
     total = sum(shares)
     shares = [share / total for share in shares]
 

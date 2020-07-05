@@ -22,12 +22,3 @@ class Type(Enum):
     ORGANISATION = auto
     CHARITY = auto
     OTHER = auto
-
-
-class Weight(Enum):
-    """Donee weight emueration."""
-
-    CRITICAL = 1.0
-    LARGE = 0.5
-    MEDIUM = 0.25
-    SMALL = 0.1
