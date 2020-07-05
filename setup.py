@@ -6,7 +6,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         "pyxdg",
-        "pyyaml"
+        "pyyaml",
+        "tabulate"
         ],
     entry_points={
         "console_scripts": [

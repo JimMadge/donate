@@ -1,5 +1,5 @@
 from .configuration import parse_config
-from .ledger import update_ledger
+from .ledger import update_ledger, print_ledger_stats
 from .maths import single_donation
 from .schedule import AdHoc
 import argparse
@@ -37,6 +37,11 @@ def main():
             " ledger or update the last donation time."
             )
         )
+    parser.add_argument(
+        "-s", "--stats",
+        action="store_true",
+        help="Print some statistics about previous donations."
+        )
 
     # Get command line argumnets
     args = parser.parse_args()
@@ -60,6 +65,11 @@ def main():
     currency_symbol = config["currency_symbol"]
     decimal_currency = config["decimal_currency"]
     schedule = config["schedule"]
+
+    # If the stats option has been declared, print statistics and exit
+    if args.stats:
+        print_ledger_stats(currency_symbol, decimal_currency)
+        return
 
     # Read last donation
     if args.ad_hoc:
