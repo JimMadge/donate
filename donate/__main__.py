@@ -21,6 +21,15 @@ def main():
         help="Specify a path to a non-default configuration file."
         )
     parser.add_argument(
+        "-a", "--ad-hoc",
+        action="store_true",
+        help=(
+            "Make an ad hoc donation, i.e. ignore your donation schedule and"
+            " last donation date. Useful in combination with '--dry-run' for"
+            " testing."
+            )
+        )
+    parser.add_argument(
         "-d", "--dry-run",
         action="store_true",
         help=(
@@ -53,14 +62,17 @@ def main():
     schedule = config["schedule"]
 
     # Read last donation
-    last_donation_file_path = config_path + "/last_donation"
-    try:
-        with open(last_donation_file_path) as last_donation_file:
-            last_donation = datetime.fromisoformat(
-                    last_donation_file.read().strip()
-                    )
-    except FileNotFoundError:
+    if args.ad_hoc:
         last_donation = None
+    else:
+        last_donation_file_path = config_path + "/last_donation"
+        try:
+            with open(last_donation_file_path) as last_donation_file:
+                last_donation = datetime.fromisoformat(
+                        last_donation_file.read().strip()
+                        )
+        except FileNotFoundError:
+            last_donation = None
 
     # Determine number of donations due
     if last_donation:
@@ -92,8 +104,9 @@ def main():
 
     # Write record of donation date and update ledger
     if not args.dry_run:
-        with open(last_donation_file_path, "w") as last_donation_file:
-            last_donation_file.write(datetime.today().isoformat()+"\n")
+        if not args.ad_hoc:
+            with open(last_donation_file_path, "w") as last_donation_file:
+                last_donation_file.write(datetime.today().isoformat()+"\n")
 
         update_ledger(individual_donations, decimal_currency)
 
