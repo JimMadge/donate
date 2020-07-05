@@ -1,4 +1,4 @@
-from ..maths import share, single_donation
+from donate.maths import share, single_donation
 import pytest
 
 

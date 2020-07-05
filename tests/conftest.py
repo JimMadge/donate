@@ -1,6 +1,6 @@
 """Test configuration."""
 import pytest
-from ..donee import Donee, Type, Weight
+from donate.donee import Donee, Type, Weight
 
 
 @pytest.fixture(scope="session")

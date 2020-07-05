@@ -1,5 +1,7 @@
-from ..configuration import parse_config, _required_keys, ConfigurationError
-from ..donee import Donee, Type, Weight
+from donate.configuration import (
+    parse_config, _required_keys, ConfigurationError
+    )
+from donate.donee import Donee, Type, Weight
 from textwrap import dedent
 import pytest
 
