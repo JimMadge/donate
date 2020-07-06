@@ -68,7 +68,11 @@ def parse_config(config_yaml):
         for name, value in weight_dict.items():
             if type(value) not in [int, float]:
                 raise ConfigurationError(
-                    "Weight '{name}' value '{value}' is not a real number"
+                    f"Weight '{name}' value '{value}' is not a real number."
+                    )
+            elif value < 0:
+                raise ConfigurationError(
+                    f"Weight '{name}' value '{value}' is negative."
                     )
     else:
         weight_dict = None
