@@ -62,11 +62,22 @@ def parse_config(config_yaml):
     if type(config["donees"]) is not list:
         raise ConfigurationError("Donees must be a list")
 
-    # Process donees
+    # Ensure weights are numbers if declared
     if "weights" in keys:
         weight_dict = config["weights"]
+        for name, value in weight_dict.items():
+            if type(value) not in [int, float]:
+                raise ConfigurationError(
+                    f"Weight '{name}' value '{value}' is not a real number."
+                    )
+            elif value < 0:
+                raise ConfigurationError(
+                    f"Weight '{name}' value '{value}' is negative."
+                    )
     else:
         weight_dict = None
+
+    # Process donees
     donees = []
     for donee_dict in config["donees"]:
         donees.append(_parse_donee(donee_dict, weight_dict))
@@ -97,6 +108,11 @@ def _parse_donee(donee_dict, weight_dict):
         weight = float(weight)
     elif weight_type is float:
         weight = weight
+
+    if weight < 0:
+        raise ConfigurationError(
+            f"Weight '{weight}' of donee '{donee_dict['name']}' is negative"
+            )
 
     return Donee(
         name=donee_dict["name"],

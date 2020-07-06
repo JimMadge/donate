@@ -75,12 +75,12 @@ The configuration file has the following top level keys
 
 Each donee requires the following keys
 
-| key      | description                                                                                                        |
-| ---      | ---                                                                                                                |
-| `name`   | Name of the donee                                                                                                  |
-| `weight` | Relative weight of donation frequency to this donee, this may be a weight declared in `weights` or any real number |
-| `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other`       |
-| `url`    | Donation url of the donee                                                                                          |
+| key      | description                                                                                                                      |
+| ---      | ---                                                                                                                              |
+| `name`   | Name of the donee                                                                                                                |
+| `weight` | Relative weight of donation frequency to this donee, this may be a weight declared in `weights` or any non-negative, real number |
+| `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other`                     |
+| `url`    | Donation url of the donee                                                                                                        |
 
 Here is a short example
 
