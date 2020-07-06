@@ -109,6 +109,11 @@ def _parse_donee(donee_dict, weight_dict):
     elif weight_type is float:
         weight = weight
 
+    if weight < 0:
+        raise ConfigurationError(
+            f"Weight '{weight}' of donee '{donee_dict['name']}' is negative"
+            )
+
     return Donee(
         name=donee_dict["name"],
         weight=weight,
