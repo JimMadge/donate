@@ -3,13 +3,19 @@ from collections import Counter
 from random import choices
 
 
-def share(donees):
-    """Calculate the share of each donee."""
-    shares = [donee.weight for donee in donees]
-    total = sum(shares)
-    shares = [share / total for share in shares]
+def weights(donees):
+    """Get weights from donees."""
+    return [donee.weight for donee in donees]
 
-    return shares
+
+def normalised_weights(donees):
+    """Calculate the normalised weights of each donee."""
+
+    n_weights = weights(donees)
+    total = sum(n_weights)
+    n_weights = [weight / total for weight in n_weights]
+
+    return n_weights
 
 
 def single_donation(donees, total_donation, split, decimal_currency=False):
@@ -39,7 +45,11 @@ def single_donation(donees, total_donation, split, decimal_currency=False):
 
     individual_donation = total_donation // split
 
-    selected = choices(donees, weights=share(donees), k=split)
+    selected = choices(
+        donees,
+        weights=weights(donees),
+        k=split
+        )
 
     individual_donations = Counter()
     for donee in selected:
