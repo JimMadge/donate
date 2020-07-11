@@ -118,8 +118,40 @@ class TestParseYAML:
         yaml_string = self.yaml_string
         yaml_string = yaml_string.replace("schedule: ad hoc",
                                           "schedule: occasional")
-        print(yaml_string)
 
         with pytest.raises(ConfigurationError) as e:
             parse_config(yaml_string)
         assert "Schedule must be one of" in str(e.value)
+
+    def test_no_weights(self):
+        yaml_string = self.yaml_string
+        yaml_string = yaml_string.replace(
+            "weights:\n  critical: 1.0\n  large: 0.5\n  medium: 0.25"
+            "\n  small: 0.1",
+            ""
+            )
+        yaml_string = yaml_string.replace("weight: critical", "weight: 1")
+        yaml_string = yaml_string.replace("weight: large", "weight: 1")
+
+        config = parse_config(yaml_string)
+        assert "weights" not in config.keys()
+
+    def test_invalid_weight_type(self):
+        yaml_string = self.yaml_string
+        yaml_string = yaml_string.replace("critical: 1.0", "critical: abc")
+
+        with pytest.raises(ConfigurationError) as e:
+            parse_config(yaml_string)
+        exception_string = (
+            "Weight 'critical' value 'abc' is not a real number."
+            )
+        assert exception_string in str(e.value)
+
+    def test_negative_weight_value(self):
+        yaml_string = self.yaml_string
+        yaml_string = yaml_string.replace("critical: 1.0", "critical: -2.5")
+
+        with pytest.raises(ConfigurationError) as e:
+            parse_config(yaml_string)
+        exception_string = "Weight 'critical' value '-2.5' is negative."
+        assert exception_string in str(e.value)
