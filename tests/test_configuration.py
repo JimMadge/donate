@@ -2,6 +2,7 @@ from donate.configuration import (
     parse_config, _required_keys, ConfigurationError
     )
 from donate.donee import Donee, Type
+from donate.schedule import AdHoc
 from textwrap import dedent
 import pytest
 
@@ -13,6 +14,7 @@ class TestParseYAML:
         split: 4
         currency_symbol: £
         decimal_currency: true
+        schedule: ad hoc
 
         weights:
           critical: 1.0
@@ -72,6 +74,7 @@ class TestParseYAML:
             split: 4
             currency_symbol: £
             decimal_currency: true
+            schedule: ad hoc
 
             donees: 5
             """)
@@ -102,3 +105,21 @@ class TestParseYAML:
         config = parse_config(yaml_string)
         assert "currency_symbol" in config.keys()
         assert config["currency_symbol"] == "£"
+
+    def test_no_schedule(self):
+        yaml_string = self.yaml_string
+        yaml_string = yaml_string.replace("schedule: ad hoc", "")
+
+        config = parse_config(yaml_string)
+        assert "schedule" in config.keys()
+        assert isinstance(config["schedule"], AdHoc)
+
+    def test_invalid_schedule(self):
+        yaml_string = self.yaml_string
+        yaml_string = yaml_string.replace("schedule: ad hoc",
+                                          "schedule: occasional")
+        print(yaml_string)
+
+        with pytest.raises(ConfigurationError) as e:
+            parse_config(yaml_string)
+        assert "Schedule must be one of" in str(e.value)
