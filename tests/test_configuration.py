@@ -70,10 +70,18 @@ class TestParseYAML:
             parse_config(yaml_string)
         assert "Donees must be a list" == str(e.value)
 
-    def test_invalid_decimal_curreny(self):
+    def test_invalid_decimal_currency(self):
         yaml_string = self.yaml_string
         yaml_string = yaml_string.replace("decimal_currency: true",
                                           "decimal_currency: aaa")
         with pytest.raises(ConfigurationError) as e:
             parse_config(yaml_string)
         assert "'decimal_currency' must be a boolean" in str(e.value)
+
+    def test_no_decimal_currency(self):
+        yaml_string = self.yaml_string
+        yaml_string = yaml_string.replace("decimal_currency: true", "")
+
+        config = parse_config(yaml_string)
+        assert "decimal_currency" in config.keys()
+        assert config["decimal_currency"] is False

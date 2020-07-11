@@ -37,10 +37,10 @@ def parse_config(config_yaml):
             raise ConfigurationError(f"Required key '{key}' not declared")
 
     # Ensure decimal currency is a boolean value if present
-    try:
+    if "decimal_currency" in keys:
         if type(config["decimal_currency"]) is not bool:
             raise ConfigurationError("'decimal_currency' must be a boolean")
-    except KeyError:
+    else:
         config["decimal_currency"] = False
 
     # Set currency if one is not declared symbol
