@@ -94,3 +94,11 @@ class TestParseYAML:
         config = parse_config(yaml_string)
         assert "decimal_currency" in config.keys()
         assert config["decimal_currency"] is False
+
+    def test_no_currency_symbol(self):
+        yaml_string = self.yaml_string
+        yaml_string = yaml_string.replace("currency_symbol: £", "")
+
+        config = parse_config(yaml_string)
+        assert "currency_symbol" in config.keys()
+        assert config["currency_symbol"] == "£"
