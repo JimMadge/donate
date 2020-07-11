@@ -36,6 +36,15 @@ class TestParseYAML:
         assert config["total_donation"] == 20
         assert len(config["donees"]) == 2
 
+    def test_parse_without_cloader(self, monkeypatch):
+        yaml_string = self.yaml_string
+
+        monkeypatch.delattr("yaml.CLoader")
+
+        config = parse_config(yaml_string)
+        assert config["total_donation"] == 20
+        assert len(config["donees"]) == 2
+
     def test_donees(self):
         config = parse_config(self.yaml_string)
         assert type(config["donees"][0]) is Donee
