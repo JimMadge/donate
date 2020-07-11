@@ -1,9 +1,10 @@
 from .configuration import parse_config
 from .ledger import update_ledger, print_ledger_stats
-from .maths import single_donation
+from .maths import single_donation, means
 from .schedule import AdHoc
 import argparse
 from datetime import datetime
+from tabulate import tabulate
 from xdg import BaseDirectory
 
 
@@ -42,6 +43,15 @@ def main():
         action="store_true",
         help="Print some statistics about previous donations."
         )
+    parser.add_argument(
+        "-m", "--means",
+        action="store",
+        type=int,
+        help=(
+            "Print the mean donation recieved by each donee from a total"
+            " donation of MEANS"
+            )
+        )
 
     # Get command line argumnets
     args = parser.parse_args()
@@ -69,6 +79,11 @@ def main():
     # If the stats option has been declared, print statistics and exit
     if args.stats:
         print_ledger_stats(currency_symbol, decimal_currency)
+        return
+
+    # If the means option has been declared, print means and exit
+    if args.means:
+        print_means(donees, args.means, currency_symbol)
         return
 
     # Read last donation
@@ -119,6 +134,18 @@ def main():
                 last_donation_file.write(datetime.today().isoformat()+"\n")
 
         update_ledger(individual_donations, decimal_currency)
+
+
+def print_means(donees, total_donation, currency_symbol):
+    names = [donee.name for donee in donees]
+    mean_donations = means(donees, total_donation)
+
+    print(f"Mean donations from {currency_symbol}{total_donation}")
+    print(tabulate(
+        list(zip(names, mean_donations)),
+        headers=["Donee", "Mean donation"]
+        ))
+    pass
 
 
 if __name__ == "__main__":

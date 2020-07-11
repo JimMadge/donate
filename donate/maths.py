@@ -56,3 +56,16 @@ def single_donation(donees, total_donation, split, decimal_currency=False):
         individual_donations[donee] += individual_donation
 
     return individual_donations
+
+
+def means(donees, total_donation):
+    """
+    Calculate the mean donation recieved by each donee.
+
+    :arg donees: List of donees.
+    :type donees: list(:class:`Donee`)
+    :arg int total_donation: Total donation amount.
+    """
+    weights = normalised_weights(donees)
+
+    return [weight * total_donation for weight in weights]
