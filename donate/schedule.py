@@ -1,15 +1,20 @@
+from abc import ABC, abstractmethod
 from datetime import datetime
 
 
-class Schedule(object):
+class Schedule(ABC):
     """Schedule base class."""
 
+    @abstractmethod
     def due_donations(self, last_donation):
         """
         Calculate how many donations are due based on the date of the last
         donation.
+
+        :arg last_donation: Time of the last donation.
+        :rtype last_donation: :class:`datetime.datetime`
         """
-        raise NotImplementedError
+        pass
 
 
 class AdHoc(Schedule):
