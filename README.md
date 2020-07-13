@@ -1,5 +1,6 @@
 # Donate
 ![.github/workflows/ci.yml](https://github.com/JimMadge/donate/workflows/.github/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/JimMadge/donate/branch/master/graph/badge.svg)](https://codecov.io/gh/JimMadge/donate)
 
 Generate donations to projects you want to support according to a distribution
 you control.
