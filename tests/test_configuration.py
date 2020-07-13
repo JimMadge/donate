@@ -233,7 +233,7 @@ class TestParseDonee:
         with pytest.raises(ConfigurationError) as e:
             _parse_donee(donee_dict, None)
         exception_message = (
-            "The weight of donee 'Favourite distro' is a string, but"
+            f"The weight of donee '{donee_dict['name']}' is a string, but"
             " no weights have been defined."
             )
         assert str(e.value) == exception_message
@@ -245,3 +245,14 @@ class TestParseDonee:
         donee = _parse_donee(donee_dict, None)
         assert type(donee.weight) is float
         assert donee.weight == expected
+
+    def test_negative_weight(self, donee_dict):
+        donee_dict["weight"] = -5
+
+        with pytest.raises(ConfigurationError) as e:
+            _parse_donee(donee_dict, None)
+
+        exception_message = (
+            f"Weight '{float(-5)}' of donee '{donee_dict['name']}' is negative"
+            )
+        assert str(e.value) == exception_message
