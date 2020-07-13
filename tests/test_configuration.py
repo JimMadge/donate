@@ -201,3 +201,14 @@ class TestParseDonee:
         assert donee.weight == weights_dict[donee_dict["weight"]]
         assert donee.donee_type == _type_map[donee_dict["type"]]
         assert donee.donation_url == donee_dict["url"]
+
+    def test_invalid_weight_name(self, donee_dict, weights_dict):
+        donee_dict["weight"] = "huge"
+
+        with pytest.raises(ConfigurationError) as e:
+            _parse_donee(donee_dict, weights_dict)
+
+        exception_message = (
+            f"Weight 'huge' of donee '{donee_dict['name']}' not defined"
+            )
+        assert str(e.value) == exception_message
