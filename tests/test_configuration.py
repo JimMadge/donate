@@ -5,6 +5,7 @@ from donate.donee import Donee, Type
 from donate.schedule import AdHoc
 from textwrap import dedent
 import pytest
+import yaml
 
 
 class TestParseYAML:
@@ -38,6 +39,10 @@ class TestParseYAML:
         assert config["total_donation"] == 20
         assert len(config["donees"]) == 2
 
+    @pytest.mark.skipif(
+        not hasattr(yaml, "CLoader"),
+        reason="yaml module has no attribute 'CLoader'"
+        )
     def test_parse_without_cloader(self, monkeypatch):
         yaml_string = self.yaml_string
 
