@@ -150,6 +150,22 @@ class TestParseConfig:
         config = parse_config(yaml_string)
         assert "weights" not in config.keys()
 
+    def test_no_weights2(self):
+        yaml_string = self.yaml_string
+        yaml_string = yaml_string.replace(
+            "weights:\n  critical: 1.0\n  large: 0.5\n  medium: 0.25"
+            "\n  small: 0.1",
+            ""
+            )
+
+        with pytest.raises(ConfigurationError) as e:
+            parse_config(yaml_string)
+        exception_message = (
+            "The weight of donee 'Favourite distro' is a string, but"
+            " no weights have been defined."
+            )
+        assert str(e.value) == exception_message
+
     def test_invalid_weight_type(self):
         yaml_string = self.yaml_string
         yaml_string = yaml_string.replace("critical: 1.0", "critical: abc")
@@ -212,3 +228,20 @@ class TestParseDonee:
             f"Weight 'huge' of donee '{donee_dict['name']}' not defined"
             )
         assert str(e.value) == exception_message
+
+    def test_missing_weights(self, donee_dict):
+        with pytest.raises(ConfigurationError) as e:
+            _parse_donee(donee_dict, None)
+        exception_message = (
+            "The weight of donee 'Favourite distro' is a string, but"
+            " no weights have been defined."
+            )
+        assert str(e.value) == exception_message
+
+    @pytest.mark.parametrize("weight,expected", [(5, 5.0), (7.0, 7.0)])
+    def test_manual_weights(self, donee_dict, weight, expected):
+        donee_dict["weight"] = weight
+
+        donee = _parse_donee(donee_dict, None)
+        assert type(donee.weight) is float
+        assert donee.weight == expected
