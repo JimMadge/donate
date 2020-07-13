@@ -1,5 +1,5 @@
 from donate.configuration import (
-    parse_config, _required_keys, ConfigurationError
+    parse_config, _required_keys, ConfigurationError, _parse_donee, _type_map
     )
 from donate.donee import Donee, Type
 from donate.schedule import AdHoc, Monthly
@@ -8,7 +8,7 @@ import pytest
 import yaml
 
 
-class TestParseYAML:
+class TestParseConfig:
     yaml_string = dedent("""\
         ---
         total_donation: 20
@@ -169,3 +169,35 @@ class TestParseYAML:
             parse_config(yaml_string)
         exception_string = "Weight 'critical' value '-2.5' is negative."
         assert exception_string in str(e.value)
+
+
+@pytest.fixture()
+def donee_dict():
+    donee_dict = {
+        "name": "Favourite distro",
+        "weight": "critical",
+        "type": "distribution",
+        "url": "distro.com"
+        }
+    return donee_dict
+
+
+@pytest.fixture()
+def weights_dict():
+    weights_dict = {
+        "critical": 1.0,
+        "large": 0.5,
+        "medium": 0.25,
+        "small": 0.1
+        }
+    return weights_dict
+
+
+class TestParseDonee:
+    def test_parse(self, donee_dict, weights_dict):
+        donee = _parse_donee(donee_dict, weights_dict)
+        assert isinstance(donee, Donee)
+        assert donee.name == donee_dict["name"]
+        assert donee.weight == weights_dict[donee_dict["weight"]]
+        assert donee.donee_type == _type_map[donee_dict["type"]]
+        assert donee.donation_url == donee_dict["url"]
