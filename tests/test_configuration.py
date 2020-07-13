@@ -2,7 +2,7 @@ from donate.configuration import (
     parse_config, _required_keys, ConfigurationError
     )
 from donate.donee import Donee, Type
-from donate.schedule import AdHoc
+from donate.schedule import AdHoc, Monthly
 from textwrap import dedent
 import pytest
 import yaml
@@ -118,6 +118,15 @@ class TestParseYAML:
         config = parse_config(yaml_string)
         assert "schedule" in config.keys()
         assert isinstance(config["schedule"], AdHoc)
+
+    def test_monthly_schedule(self):
+        yaml_string = self.yaml_string
+        yaml_string = yaml_string.replace("schedule: ad hoc",
+                                          "schedule: monthly")
+
+        config = parse_config(yaml_string)
+        assert "schedule" in config.keys()
+        assert isinstance(config["schedule"], Monthly)
 
     def test_invalid_schedule(self):
         yaml_string = self.yaml_string
