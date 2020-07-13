@@ -41,8 +41,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
       - name: Test
         run: |
           python -m pytest -v --cov=./donate --cov-report=xml
