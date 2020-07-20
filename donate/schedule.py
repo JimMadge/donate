@@ -14,7 +14,6 @@ class Schedule(ABC):
         :arg last_donation: Time of the last donation.
         :rtype last_donation: :class:`datetime.datetime`
         """
-        pass
 
 
 class AdHoc(Schedule):
