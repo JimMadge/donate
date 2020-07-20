@@ -1,3 +1,4 @@
+import donate
 from donate.maths import weights, normalised_weights, single_donation, means
 import pytest
 
@@ -52,6 +53,19 @@ class TestSingleDonation:
         with pytest.raises(ValueError) as e:
             single_donation(donees, 10, 3)
         assert f"The donation split {3}" in str(e.value)
+
+    def test_single_donation_output(self, donees, monkeypatch):
+        # Create mock choices function which just returns 'k' of the first
+        # element
+        def mock_choices(population, weights, *, k=1):
+            return [population[0]]*k
+        monkeypatch.setattr(donate.maths, "choices", mock_choices)
+
+        individual_donations = single_donation(donees, 20, 4)
+        assert sum(individual_donations.values()) == 20
+        assert len(individual_donations) == 1
+        for donee in individual_donations:
+            assert donee is donees[0]
 
 
 def test_means(donees):
