@@ -1,13 +1,14 @@
 from collections import Counter
 import json
+from pathlib import Path
 from tabulate import tabulate
 from xdg import BaseDirectory
 
 
 def _get_ledger():
     # Open existing ledger, or create a new one
-    data_path = BaseDirectory.save_data_path("donate")
-    ledger_path = data_path + "/ledger.json"
+    data_path = Path(BaseDirectory.save_data_path("donate"))
+    ledger_path = data_path / "ledger.json"
     try:
         with open(ledger_path, "r") as ledger_file:
             ledger = json.load(ledger_file)
