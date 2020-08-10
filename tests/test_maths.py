@@ -1,5 +1,12 @@
-from donate.maths import normalised_weights, single_donation
+import donate
+from donate.maths import weights, normalised_weights, single_donation, means
 import pytest
+
+
+def test_weights(donees):
+    donee_weights = weights(donees)
+    for donee, weight in zip(donees, donee_weights):
+        assert donee.weight == weight
 
 
 @pytest.fixture(scope="session")
@@ -27,12 +34,43 @@ class TestSingleDonation:
         assert sum(individual_donations.values()) == 20
         assert len(individual_donations) == 1
 
+    def test_single_split_decimal(self, donees):
+        individual_donations = single_donation(donees, 20, 1, True)
+        assert sum(individual_donations.values()) == 2000
+        assert len(individual_donations) == 1
+
     def test_multiple_split(self, donees):
         individual_donations = single_donation(donees, 20, 4)
         assert sum(individual_donations.values()) == 20
+        assert len(individual_donations) <= 4
+
+    def test_multiple_split_decimal(self, donees):
+        individual_donations = single_donation(donees, 20, 4, True)
+        assert sum(individual_donations.values()) == 2000
         assert len(individual_donations) <= 4
 
     def test_non_divisable(self, donees):
         with pytest.raises(ValueError) as e:
             single_donation(donees, 10, 3)
         assert f"The donation split {3}" in str(e.value)
+
+    def test_single_donation_output(self, donees, monkeypatch):
+        # Create mock choices function which just returns 'k' of the first
+        # element
+        def mock_choices(population, weights, *, k=1):
+            return [population[0]]*k
+        monkeypatch.setattr(donate.maths, "choices", mock_choices)
+
+        individual_donations = single_donation(donees, 20, 4)
+        assert sum(individual_donations.values()) == 20
+        assert len(individual_donations) == 1
+        for donee in individual_donations:
+            assert donee is donees[0]
+
+
+def test_means(donees):
+    donee_means = means(donees, 100)
+    expected_means = [32.25806451612903, 16.129032258064516, 8.064516129032258,
+                      8.064516129032258, 8.064516129032258, 8.064516129032258,
+                      8.064516129032258, 8.064516129032258, 3.225806451612903]
+    assert donee_means == expected_means

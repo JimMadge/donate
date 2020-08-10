@@ -1,13 +1,14 @@
 from collections import Counter
 import json
+from pathlib import Path
 from tabulate import tabulate
 from xdg import BaseDirectory
 
 
 def _get_ledger():
     # Open existing ledger, or create a new one
-    data_path = BaseDirectory.save_data_path("donate")
-    ledger_path = data_path + "/ledger.json"
+    data_path = Path(BaseDirectory.save_data_path("donate"))
+    ledger_path = data_path / "ledger.json"
     try:
         with open(ledger_path, "r") as ledger_file:
             ledger = json.load(ledger_file)
@@ -35,18 +36,20 @@ def update_ledger(donations, decimal_currency):
         json.dump(ledger, ledger_file, indent=2)
 
 
-def print_ledger_stats(currency_symbol, decimal_currency):
+def ledger_stats(currency_symbol):
     ledger, ledger_path = _get_ledger()
     total = ledger["total"]
     number = ledger["number"]
 
-    print(tabulate(
-        list(total.items()),
-        headers=["Donee", f"Total / {currency_symbol}"]
-        ))
-
-    print("\n")
-    print(tabulate(
-        list(number.items()),
-        headers=["Donee", "Number of donations"]
-        ))
+    stats = "\n".join([
+        tabulate(
+            list(total.items()),
+            headers=["Donee", f"Total / {currency_symbol}"]
+        ),
+        "\n",
+        tabulate(
+            list(number.items()),
+            headers=["Donee", "Number of donations"]
+        )
+    ])
+    return stats
