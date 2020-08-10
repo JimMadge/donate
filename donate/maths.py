@@ -26,8 +26,8 @@ def single_donation(donees, total_donation, split, decimal_currency=False):
     :type donees: list(:class:`Donee`)
     :arg int total_donation: Total donation amount.
     :arg int split: Number of donees to split the total donation between.
-    :arg bool decimal_currency: If `True` allow spliting individual donations
-        into hundreths. Default: `False`.
+    :arg bool decimal_currency: If `True` allow splitting individual donations
+        into hundredths. Default: `False`.
 
     :returns: Dictionary of each donee and their donation amount.
     :rtype: :class:`collections.Counter`
@@ -60,7 +60,7 @@ def single_donation(donees, total_donation, split, decimal_currency=False):
 
 def means(donees, total_donation):
     """
-    Calculate the mean donation recieved by each donee.
+    Calculate the mean donation received by each donee.
 
     :arg donees: List of donees.
     :type donees: list(:class:`Donee`)
