@@ -1,5 +1,5 @@
 import donate
-from donate.maths import weights, normalised_weights, single_donation, means
+from donate.maths import weights, normalised_weights, single_donation, _means
 import pytest
 
 
@@ -69,7 +69,7 @@ class TestSingleDonation:
 
 
 def test_means(donees):
-    donee_means = means(donees, 100)
+    donee_means = _means(donees, 100)
     expected_means = [32.25806451612903, 16.129032258064516, 8.064516129032258,
                       8.064516129032258, 8.064516129032258, 8.064516129032258,
                       8.064516129032258, 8.064516129032258, 3.225806451612903]
