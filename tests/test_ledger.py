@@ -42,21 +42,17 @@ class TestGetLedger:
         assert str(ledger_path).endswith("donate/ledger.json")
 
 
-def test_ledger_stats(tmp_path, monkeypatch, capsys):
-    def mock_save_data_path(resource):
-        return tmp_path / resource
+def test_ledger_stats(monkeypatch):
+    def mock_get_ledger():
+        return (
+            {
+                "total": {"a": 50, "b": 30},
+                "number": {"a": 5, "b": 2}
+            },
+            None
+        )
 
-    ledger_dict = {
-        "total": {"a": 50, "b": 30},
-        "number": {"a": 5, "b": 2}
-    }
-    ledger_path = mock_save_data_path("donate")
-    ledger_path.mkdir()
-    with open(ledger_path / "ledger.json", "w") as ledger:
-        json.dump(ledger_dict, ledger)
-
-    monkeypatch.setattr(donate.ledger.BaseDirectory, "save_data_path",
-                        mock_save_data_path)
+    monkeypatch.setattr(donate.ledger, "_get_ledger", mock_get_ledger)
 
     stats = ledger_stats("£")
     # Split the total donation and number of donation parts
