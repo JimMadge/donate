@@ -74,14 +74,14 @@ The configuration file has the following top level keys
 | `weights`          | A set of user-declared, donation weights           | no       |          |
 | `donees`           | List of donees                                     | yes      |          |
 
-Each donee requires the following keys
+Each donee has the following keys
 
-| key      | description                                                                                                                      |
-| ---      | ---                                                                                                                              |
-| `name`   | Name of the donee                                                                                                                |
-| `weight` | Relative weight of donation frequency to this donee, this may be a weight declared in `weights` or any non-negative, real number |
-| `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other`                     |
-| `url`    | Donation url of the donee                                                                                                        |
+| key      | description                                                                                                                      | required | default |
+| ---      | ---                                                                                                                              | ---      | ---     |
+| `name`   | Name of the donee                                                                                                                | yes      |         |
+| `weight` | Relative weight of donation frequency to this donee, this may be a weight declared in `weights` or any non-negative, real number | yes      |         |
+| `url`    | Donation url of the donee                                                                                                        | yes      |         |
+| `type`   | Optional, free-text, category of donee for example `software`, `distribution`, or `podcast`                                      | no       | `other` |
 
 Here is a short example
 

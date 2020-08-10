@@ -1,6 +1,6 @@
 from .configuration import parse_config
 from .ledger import update_ledger, ledger_stats
-from .maths import single_donation, means
+from .maths import single_donation, donee_means, category_means
 from .schedule import AdHoc
 import argparse
 from datetime import datetime
@@ -48,8 +48,8 @@ def main():
         action="store",
         type=int,
         help=(
-            "Print the mean donation recieved by each donee from a total"
-            " donation of MEANS"
+            "Print the mean donation recieved by each donee and donee category"
+            " from a total donation of MEANS"
             )
         )
 
@@ -137,15 +137,16 @@ def main():
 
 
 def print_means(donees, total_donation, currency_symbol):
-    names = [donee.name for donee in donees]
-    mean_donations = means(donees, total_donation)
-
     print(f"Mean donations from {currency_symbol}{total_donation}")
     print(tabulate(
-        list(zip(names, mean_donations)),
+        donee_means(donees, total_donation),
         headers=["Donee", "Mean donation"]
         ))
-    pass
+    print("\n")
+    print(tabulate(
+        category_means(donees, total_donation).items(),
+        headers=["Category", "Mean donation"]
+        ))
 
 
 if __name__ == "__main__":
