@@ -80,8 +80,8 @@ Each donee has the following keys
 | ---      | ---                                                                                                                              | ---      | ---     |
 | `name`   | Name of the donee                                                                                                                | yes      |         |
 | `weight` | Relative weight of donation frequency to this donee, this may be a weight declared in `weights` or any non-negative, real number | yes      |         |
-| `type`   | Type of donee, one of `software`, `distribution`, `service`, `podcast`, `organisation`, `charity` or `other`                     | no       | `other` |
 | `url`    | Donation url of the donee                                                                                                        | yes      |         |
+| `type`   | Optional, free-text, category of donee for example `software`, `distribution`, or `podcast`                                      | no       | `other` |
 
 Here is a short example
 
