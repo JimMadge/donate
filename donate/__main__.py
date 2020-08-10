@@ -1,5 +1,5 @@
 from .configuration import parse_config
-from .ledger import update_ledger, print_ledger_stats
+from .ledger import update_ledger, ledger_stats
 from .maths import single_donation, means
 from .schedule import AdHoc
 import argparse
@@ -78,7 +78,7 @@ def main():
 
     # If the stats option has been declared, print statistics and exit
     if args.stats:
-        print_ledger_stats(currency_symbol, decimal_currency)
+        print(ledger_stats(currency_symbol))
         return
 
     # If the means option has been declared, print means and exit

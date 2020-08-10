@@ -36,18 +36,20 @@ def update_ledger(donations, decimal_currency):
         json.dump(ledger, ledger_file, indent=2)
 
 
-def print_ledger_stats(currency_symbol, decimal_currency):
+def ledger_stats(currency_symbol):
     ledger, ledger_path = _get_ledger()
     total = ledger["total"]
     number = ledger["number"]
 
-    print(tabulate(
-        list(total.items()),
-        headers=["Donee", f"Total / {currency_symbol}"]
-        ))
-
-    print("\n")
-    print(tabulate(
-        list(number.items()),
-        headers=["Donee", "Number of donations"]
-        ))
+    stats = "\n".join([
+        tabulate(
+            list(total.items()),
+            headers=["Donee", f"Total / {currency_symbol}"]
+        ),
+        "\n",
+        tabulate(
+            list(number.items()),
+            headers=["Donee", "Number of donations"]
+        )
+    ])
+    return stats
