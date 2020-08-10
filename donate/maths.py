@@ -58,7 +58,11 @@ def single_donation(donees, total_donation, split, decimal_currency=False):
     return individual_donations
 
 
-def means(donees, total_donation):
+def _means(weights, total_donation):
+    return [weight * total_donation for weight in weights]
+
+
+def donee_means(donees, total_donation):
     """
     Calculate the mean donation received by each donee.
 
@@ -68,4 +72,23 @@ def means(donees, total_donation):
     """
     weights = normalised_weights(donees)
 
-    return [weight * total_donation for weight in weights]
+    names = [donee.name for donee in donees]
+    means = _means(weights, total_donation)
+    return list(zip(names, means))
+
+
+def category_means(donees, total_donation):
+    """
+    Calculate the mean donation received by each category of donee.
+
+    :arg donees: List of donees.
+    :type donees: list(:class:`Donee`)
+    :arg int total_donation: Total donation amount.
+    """
+    weights = normalised_weights(donees)
+    means = _means(weights, total_donation)
+
+    category_means = Counter()
+    for donee, mean in zip(donees, means):
+        category_means[donee.category] += mean
+    return category_means
