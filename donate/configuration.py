@@ -1,19 +1,9 @@
 """Configuration parsing."""
-from .donee import Donee, Type
+from .donee import Donee
 from .schedule import AdHoc, Monthly
 from yaml import load
 
 _required_keys = ["total_donation", "split", "donees"]
-
-_type_map = {
-    "software": Type.SOFTWARE,
-    "distribution": Type.DISTRIBUTION,
-    "service": Type.SERVICE,
-    "podcast": Type.PODCAST,
-    "organisation": Type.ORGANISATION,
-    "charity": Type.CHARITY,
-    "other": Type.OTHER
-    }
 
 _schedule_map = {
     "ad hoc": AdHoc,
@@ -87,13 +77,15 @@ def parse_config(config_yaml):
 
 
 def _parse_donee(donee_dict, weight_dict):
+    name = donee_dict["name"]
+
     # Process weight argument
     weight = donee_dict["weight"]
     if (weight_type := type(weight)) is str:
         # If weight is a string, ensure weight keywords have been declared
         if weight_dict is None:
             raise ConfigurationError(
-                f"The weight of donee '{donee_dict['name']}' is a string, but"
+                f"The weight of donee '{name}' is a string, but"
                 " no weights have been defined."
                 )
 
@@ -101,7 +93,7 @@ def _parse_donee(donee_dict, weight_dict):
             weight = weight_dict[weight]
         except KeyError:
             raise ConfigurationError(
-                f"Weight '{weight}' of donee '{donee_dict['name']}' not"
+                f"Weight '{weight}' of donee '{name}' not"
                 " defined"
                 )
     elif weight_type is int:
@@ -111,13 +103,22 @@ def _parse_donee(donee_dict, weight_dict):
 
     if weight < 0:
         raise ConfigurationError(
-            f"Weight '{weight}' of donee '{donee_dict['name']}' is negative"
+            f"Weight '{weight}' of donee '{name}' is negative"
             )
 
+    if "category" in donee_dict.keys():
+        category = donee_dict["category"]
+        if type(category) is not str:
+            raise ConfigurationError(
+                f"Category '{category}' of donee '{name}' is not a string."
+            )
+    else:
+        category = "other"
+
     return Donee(
-        name=donee_dict["name"],
+        name=name,
         weight=weight,
-        donee_type=_type_map[donee_dict["type"].lower()],
+        category=category.lower(),
         donation_url=donee_dict["url"]
         )
 

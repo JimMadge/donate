@@ -1,7 +1,7 @@
 from donate.configuration import (
-    parse_config, _required_keys, ConfigurationError, _parse_donee, _type_map
+    parse_config, _required_keys, ConfigurationError, _parse_donee
     )
-from donate.donee import Donee, Type
+from donate.donee import Donee
 from donate.schedule import AdHoc, Monthly
 from textwrap import dedent
 import pytest
@@ -26,11 +26,10 @@ class TestParseConfig:
         donees:
           - name: Favourite distro
             weight: critical
-            type: distribution
+            category: distribution
             url: distro.com
           - name: Favourite software
             weight: large
-            type: software
             url: software.com
         """)
 
@@ -59,10 +58,18 @@ class TestParseConfig:
         expected_donee = Donee(
             name="Favourite distro",
             weight=1.0,
-            donee_type=Type.DISTRIBUTION,
+            category="distribution",
             donation_url="distro.com"
             )
         assert config["donees"][0] == expected_donee
+
+        expected_donee = Donee(
+            name="Favourite software",
+            weight=0.5,
+            category="other",
+            donation_url="software.com"
+            )
+        assert config["donees"][1] == expected_donee
 
     @pytest.mark.parametrize("key", _required_keys)
     def test_missing_key(self, key):
@@ -192,7 +199,7 @@ def donee_dict():
     donee_dict = {
         "name": "Favourite distro",
         "weight": "critical",
-        "type": "distribution",
+        "category": "Distribution",
         "url": "distro.com"
         }
     return donee_dict
@@ -215,7 +222,7 @@ class TestParseDonee:
         assert isinstance(donee, Donee)
         assert donee.name == donee_dict["name"]
         assert donee.weight == weights_dict[donee_dict["weight"]]
-        assert donee.donee_type == _type_map[donee_dict["type"]]
+        assert donee.category == donee_dict["category"].lower()
         assert donee.donation_url == donee_dict["url"]
 
     def test_invalid_weight_name(self, donee_dict, weights_dict):
