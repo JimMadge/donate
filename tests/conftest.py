@@ -5,7 +5,7 @@ from donate.donee import Donee
 
 @pytest.fixture(scope="session")
 def donees():
-    """Create Example donees for testing."""
+    """Create example donees for testing."""
     return [Donee(*args) for args in [
         ("Favourite distro", 1.0, "distribution", "distro.com"),
         ("Favourite software", 0.5, "software", "software.com"),
@@ -17,3 +17,14 @@ def donees():
         ("Charity", 0.25, "organisation", "charity.com"),
         ("Token support", 0.1, "software", "softare.com")
     ]]
+
+
+@pytest.fixture(scope="session")
+def donations(donees):
+    """Create an example set of donations."""
+
+    return {
+        donees[0]: 100,
+        donees[1]: 50,
+        donees[3]: 10
+    }
