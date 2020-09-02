@@ -1,5 +1,6 @@
 from .configuration import parse_config
 from .ledger import update_ledger, ledger_stats
+from .logs import update_log
 from .maths import single_donation, donee_means, category_means
 from .schedule import AdHoc
 import argparse
@@ -127,13 +128,20 @@ def main():
         print(f"{donee.name} -- {currency_symbol}{amount} -->"
               f" {donee.donation_url}")
 
-    # Write record of donation date and update ledger
-    if not args.dry_run:
-        if not args.ad_hoc:
-            with open(last_donation_file_path, "w") as last_donation_file:
-                last_donation_file.write(datetime.today().isoformat()+"\n")
+    # Return before updating any files if this is a dry run
+    if args.dry_run:
+        return
 
-        update_ledger(individual_donations, decimal_currency)
+    # Record of donation date
+    if not args.ad_hoc:
+        with open(last_donation_file_path, "w") as last_donation_file:
+            last_donation_file.write(datetime.today().isoformat()+"\n")
+
+    # Append donations to log
+    update_log(individual_donations, currency_symbol, decimal_currency)
+
+    # Update ledger
+    update_ledger(individual_donations, decimal_currency)
 
 
 def print_means(donees, total_donation, currency_symbol):
