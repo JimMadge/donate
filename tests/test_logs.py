@@ -1,8 +1,16 @@
 """Test log functions."""
 from datetime import date
 import donate
-from donate.logs import update_log
+from donate.logs import _log_path, update_log
 import pytest
+
+
+def test_log_path():
+    log_path = _log_path()
+    path_string = str(log_path.absolute())
+
+    assert path_string.split("/")[-1] == "donation_log.csv"
+    assert path_string.split("/")[-2] == "donate"
 
 
 @pytest.fixture
