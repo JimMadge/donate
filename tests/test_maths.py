@@ -83,3 +83,12 @@ def test_donee_means(donees):
     means = donee_means(donees, 100)
 
     assert [elem[1] for elem in means] == expected_means
+
+
+def test_category_means(donees):
+    means = category_means(donees, 100)
+
+    assert means["distribution"] == 32.25806451612903
+    assert means["podcast"] == 32.25806451612903
+    assert means["software"] == 27.41935483870968
+    assert means["organisation"] == 8.064516129032258
