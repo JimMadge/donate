@@ -1,6 +1,7 @@
 from collections import Counter
 import donate
-from donate.ledger import _ledger_path, _get_ledger, ledger_stats
+from donate.ledger import (_ledger_path, _get_ledger, update_ledger,
+                           ledger_stats)
 import json
 import pytest
 import re
@@ -44,6 +45,61 @@ def test_ledger(monkeypatch, mock_ledger_path):
     assert ledger == {
         "total": Counter(ledger_dict["total"]),
         "number": Counter(ledger_dict["number"])}
+
+
+def test_update_empty_ledger(monkeypatch, donations, mock_ledger_path):
+    monkeypatch.setattr(donate.ledger, "_ledger_path", mock_ledger_path)
+
+    update_ledger(donations, decimal_currency=False)
+
+    with open(mock_ledger_path(), "r") as ledger_file:
+        ledger = json.load(ledger_file)
+
+    assert ledger["total"]["Favourite distro"] == 100
+    assert ledger["total"]["Favourite software"] == 50
+    assert ledger["number"]["Favourite distro"] == 1
+    assert ledger["number"]["Favourite software"] == 1
+
+
+def test_update_empty_ledger_decimal(monkeypatch, donations, mock_ledger_path):
+    monkeypatch.setattr(donate.ledger, "_ledger_path", mock_ledger_path)
+
+    update_ledger(donations, decimal_currency=True)
+
+    with open(mock_ledger_path(), "r") as ledger_file:
+        ledger = json.load(ledger_file)
+
+    assert ledger["total"]["Favourite distro"] == 1.0
+    assert ledger["total"]["Favourite software"] == 0.5
+    assert ledger["number"]["Favourite distro"] == 1
+    assert ledger["number"]["Favourite software"] == 1
+
+
+def test_update_ledger(monkeypatch, donees, donations, mock_ledger_path):
+    def mock_get_ledger():
+        return {
+            "total": Counter(
+                {"Favourite distro": 50, "Favourite software": 30}
+            ),
+            "number": Counter(
+                {"Favourite distro": 5, "Favourite software": 2}
+            )
+        }
+
+    monkeypatch.setattr(donate.ledger, "_ledger_path", mock_ledger_path)
+    monkeypatch.setattr(donate.ledger, "_get_ledger", mock_get_ledger)
+
+    update_ledger(donations, decimal_currency=False)
+
+    with open(mock_ledger_path(), "r") as ledger_file:
+        ledger = json.load(ledger_file)
+
+    assert ledger["total"]["Favourite distro"] == 150
+    assert ledger["total"]["Favourite software"] == 80
+    assert ledger["total"]["Podcast 1"] == 10
+    assert ledger["number"]["Favourite distro"] == 6
+    assert ledger["number"]["Favourite software"] == 3
+    assert ledger["number"]["Podcast 1"] == 1
 
 
 def test_ledger_stats(monkeypatch):
