@@ -10,9 +10,7 @@ def _log_path():
 
 
 def update_log(donations, currency_symbol, decimal_currency):
-    log_path = _log_path
-
-    with open(log_path, "a", newline="") as csvfile:
+    with open(_log_path(), "a", newline="") as csvfile:
         log_writer = writer(csvfile)
 
         donation_date = date.today().isoformat()
