@@ -71,13 +71,26 @@ class TestParseConfig:
             )
         assert config["donees"][1] == expected_donee
 
+    def test_invalid_category(self):
+        yaml_string = self.yaml_string
+        yaml_string = self.yaml_string.replace(
+            "category: distribution",
+            "category: 5"
+        )
+        with pytest.raises(ConfigurationError) as e:
+            parse_config(yaml_string)
+            assert (
+                "Category '5' of donee 'Favourite distro' is not a string."
+                in str(e.value)
+            )
+
     @pytest.mark.parametrize("key", _required_keys)
     def test_missing_key(self, key):
         yaml_string = self.yaml_string
         yaml_string = yaml_string.replace(key, "invalid_key")
         with pytest.raises(ConfigurationError) as e:
             parse_config(yaml_string)
-        assert f"Required key '{key}' not declared" in str(e.value)
+            assert f"Required key '{key}' not declared" in str(e.value)
 
     def test_donees_is_list(self):
         yaml_string = dedent("""\
