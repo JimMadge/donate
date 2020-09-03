@@ -70,10 +70,15 @@ def donee_means(donees, total_donation):
     :arg donees: List of donees.
     :type donees: list(:class:`Donee`)
     :arg int total_donation: Total donation amount.
+
+    :returns: A list of donees and the mean donation received sorted by the
+        donation amount.
+    :rtype: list(tuple(str, float))
     """
     names = [donee.name for donee in donees]
     means = _means(donees, total_donation)
-    return list(zip(names, means))
+    return sorted(list(zip(names, means)), key=lambda elem: elem[1],
+                  reverse=True)
 
 
 def category_means(donees, total_donation):
@@ -83,10 +88,16 @@ def category_means(donees, total_donation):
     :arg donees: List of donees.
     :type donees: list(:class:`Donee`)
     :arg int total_donation: Total donation amount.
+
+    :returns: A list of categories and the mean donation received sorted by the
+        donation amount.
+    :rtype: list(tuple(str, float))
     """
     means = _means(donees, total_donation)
 
     category_means = Counter()
     for donee, mean in zip(donees, means):
         category_means[donee.category] += mean
-    return category_means
+
+    return sorted(category_means.items(), key=lambda item: item[1],
+                  reverse=True)

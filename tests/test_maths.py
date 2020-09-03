@@ -88,7 +88,8 @@ def test_donee_means(donees):
 def test_category_means(donees):
     means = category_means(donees, 100)
 
-    assert means["distribution"] == 32.25806451612903
-    assert means["podcast"] == 32.25806451612903
-    assert means["software"] == 27.41935483870968
-    assert means["organisation"] == 8.064516129032258
+    assert len(means) == 4
+    assert means[0] == ("distribution", 32.25806451612903)
+    assert means[1] == ("podcast", 32.25806451612903)
+    assert means[2] == ("software", 27.41935483870968)
+    assert means[3] == ("organisation", 8.064516129032258)
