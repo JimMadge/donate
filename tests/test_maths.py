@@ -1,5 +1,6 @@
 import donate
-from donate.maths import weights, normalised_weights, single_donation, _means
+from donate.maths import (weights, normalised_weights, single_donation, _means,
+                          donee_means, category_means)
 import pytest
 
 
@@ -19,10 +20,10 @@ def test_normalised_weights(example_normalised_weights):
 
 
 @pytest.mark.parametrize("number,share", [
-    (0, 0.3225806),
+    (2, 0.3225806),
     (5, 0.0806452),
     (7, 0.0806452),
-    (8, 0.0322581)
+    (6, 0.0322581)
     ])
 def test_share(example_normalised_weights, number, share):
     assert example_normalised_weights[number] == pytest.approx(share, rel=1e-5)
@@ -68,9 +69,27 @@ class TestSingleDonation:
             assert donee is donees[0]
 
 
+expected_means = [16.129032258064516, 8.064516129032258, 32.25806451612903,
+                  8.064516129032258, 8.064516129032258, 8.064516129032258,
+                  3.225806451612903, 8.064516129032258, 8.064516129032258]
+
+
 def test_means(donees):
-    donee_means = _means(donees, 100)
-    expected_means = [32.25806451612903, 16.129032258064516, 8.064516129032258,
-                      8.064516129032258, 8.064516129032258, 8.064516129032258,
-                      8.064516129032258, 8.064516129032258, 3.225806451612903]
-    assert donee_means == expected_means
+    means = _means(donees, 100)
+    assert means == expected_means
+
+
+def test_donee_means(donees):
+    means = donee_means(donees, 100)
+
+    assert [elem[1] for elem in means] == sorted(expected_means, reverse=True)
+
+
+def test_category_means(donees):
+    means = category_means(donees, 100)
+
+    assert len(means) == 4
+    assert means[0] == ("distribution", 32.25806451612903)
+    assert means[1] == ("podcast", 32.25806451612903)
+    assert means[2] == ("software", 27.41935483870968)
+    assert means[3] == ("organisation", 8.064516129032258)

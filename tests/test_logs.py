@@ -15,7 +15,9 @@ def test_log_path():
 
 @pytest.fixture
 def mock_log_path(tmp_path):
-    return tmp_path / "donation_log.csv"
+    def _log_path():
+        return tmp_path / "donation_log.csv"
+    return _log_path
 
 
 @pytest.fixture
@@ -34,7 +36,7 @@ def test_update_log(monkeypatch, mock_log_path, mock_date, donations):
 
     update_log(donations, "£", False)
 
-    with open(mock_log_path, "r") as csvfile:
+    with open(mock_log_path(), "r") as csvfile:
         log_lines = csvfile.readlines()
 
     assert "1990-09-11" in log_lines[0]
@@ -54,10 +56,9 @@ def test_update_log_decimal(monkeypatch, mock_log_path, mock_date, donations):
 
     update_log(donations, "$", True)
 
-    with open(mock_log_path, "r") as csvfile:
+    with open(mock_log_path(), "r") as csvfile:
         log_lines = csvfile.readlines()
 
-    print(log_lines)
     assert "1990-09-11" in log_lines[0]
     assert "Favourite distro" in log_lines[0]
     assert "$,1.0" in log_lines[0]

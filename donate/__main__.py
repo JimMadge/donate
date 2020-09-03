@@ -152,7 +152,7 @@ def print_means(donees, total_donation, currency_symbol):
         ))
     print("\n")
     print(tabulate(
-        category_means(donees, total_donation).items(),
+        category_means(donees, total_donation),
         headers=["Category", "Mean donation"]
         ))
 
