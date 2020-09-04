@@ -87,17 +87,14 @@ def main():
         return
 
     # Read last donation
-    if args.ad_hoc:
+    last_donation_file_path = config_path + "/last_donation"
+    try:
+        with open(last_donation_file_path) as last_donation_file:
+            last_donation = datetime.fromisoformat(
+                last_donation_file.read().strip()
+            )
+    except FileNotFoundError:
         last_donation = None
-    else:
-        last_donation_file_path = config_path + "/last_donation"
-        try:
-            with open(last_donation_file_path) as last_donation_file:
-                last_donation = datetime.fromisoformat(
-                        last_donation_file.read().strip()
-                        )
-        except FileNotFoundError:
-            last_donation = None
 
     # Determine number of donations due
     if last_donation:
@@ -131,10 +128,9 @@ def main():
     if args.dry_run:
         return
 
-    # Record of donation date
-    if not args.ad_hoc:
-        with open(last_donation_file_path, "w") as last_donation_file:
-            last_donation_file.write(datetime.today().isoformat()+"\n")
+    # Record donation date
+    with open(last_donation_file_path, "w") as last_donation_file:
+        last_donation_file.write(datetime.today().isoformat()+"\n")
 
     # Append donations to log
     update_log(individual_donations, currency_symbol, decimal_currency)
