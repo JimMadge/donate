@@ -82,7 +82,14 @@ def test_means(donees):
 def test_donee_means(donees):
     means = donee_means(donees, 100)
 
+    expected_donees = [
+        "Favourite distro", "Favourite software", "Useful software",
+        "Podcast 1", "Podcast 2", "Podcast 3", "Podcast 4", "Charity",
+        "Token support"
+    ]
+
     assert [elem[1] for elem in means] == sorted(expected_means, reverse=True)
+    assert [elem[0] for elem in means] == expected_donees
 
 
 def test_category_means(donees):
