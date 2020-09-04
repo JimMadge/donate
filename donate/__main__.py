@@ -1,11 +1,10 @@
 from .configuration import parse_config
 from .ledger import update_ledger, ledger_stats
 from .logs import update_log
-from .maths import single_donation, donee_means, category_means
+from .maths import single_donation, means_summary
 from .schedule import AdHoc
 import argparse
 from datetime import datetime
-from tabulate import tabulate
 from xdg import BaseDirectory
 
 
@@ -84,7 +83,7 @@ def main():
 
     # If the means option has been declared, print means and exit
     if args.means:
-        print_means(donees, args.means, currency_symbol)
+        print(means_summary(donees, args.means, currency_symbol))
         return
 
     # Read last donation
@@ -142,19 +141,6 @@ def main():
 
     # Update ledger
     update_ledger(individual_donations, decimal_currency)
-
-
-def print_means(donees, total_donation, currency_symbol):
-    print(f"Mean donations from {currency_symbol}{total_donation}")
-    print(tabulate(
-        donee_means(donees, total_donation),
-        headers=["Donee", "Mean donation"]
-        ))
-    print("\n")
-    print(tabulate(
-        category_means(donees, total_donation),
-        headers=["Category", "Mean donation"]
-        ))
 
 
 if __name__ == "__main__":
