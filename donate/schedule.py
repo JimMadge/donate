@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+from pathlib import Path
+from xdg import BaseDirectory
 
 
 class Schedule(ABC):
@@ -35,3 +37,29 @@ class Monthly(Schedule):
             )
 
         return elapsed_months
+
+
+def _last_donation_path():
+    data_path = Path(BaseDirectory.save_data_path("donate"))
+    return data_path / "last_donation"
+
+
+def get_last_donation():
+    last_donation_path = _last_donation_path()
+
+    try:
+        with open(last_donation_path) as last_donation_file:
+            last_donation = datetime.fromisoformat(
+                last_donation_file.read().strip()
+            )
+    except FileNotFoundError:
+        last_donation = None
+
+    return last_donation
+
+
+def update_last_donation():
+    last_donation_path = _last_donation_path()
+
+    with open(last_donation_path, "w") as last_donation_file:
+        last_donation_file.write(datetime.today().isoformat()+"\n")

@@ -2,9 +2,8 @@ from .configuration import parse_config
 from .ledger import update_ledger, ledger_stats
 from .logs import update_log
 from .maths import single_donation, means_summary
-from .schedule import AdHoc
+from .schedule import AdHoc, get_last_donation, update_last_donation
 import argparse
-from datetime import datetime
 from xdg import BaseDirectory
 
 
@@ -86,15 +85,8 @@ def main():
         print(means_summary(donees, args.means, currency_symbol))
         return
 
-    # Read last donation
-    last_donation_file_path = config_path + "/last_donation"
-    try:
-        with open(last_donation_file_path) as last_donation_file:
-            last_donation = datetime.fromisoformat(
-                last_donation_file.read().strip()
-            )
-    except FileNotFoundError:
-        last_donation = None
+    # Get time of last donation
+    last_donation = get_last_donation()
 
     # Determine number of donations due
     if last_donation:
@@ -129,8 +121,7 @@ def main():
         return
 
     # Record donation date
-    with open(last_donation_file_path, "w") as last_donation_file:
-        last_donation_file.write(datetime.today().isoformat()+"\n")
+    update_last_donation()
 
     # Append donations to log
     update_log(individual_donations, currency_symbol, decimal_currency)
