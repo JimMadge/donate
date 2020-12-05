@@ -63,7 +63,7 @@ def main():
     if args.config:
         config_file_path = args.config
     else:
-        config_file_path = config_path + "/config.yml"
+        config_file_path = config_path + "/config.yaml"
 
     # Parse configuration file
     with open(config_file_path, "r") as config_file:
