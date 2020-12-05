@@ -12,9 +12,9 @@ def test_schedule():
 
     exception_message = (
         "Can't instantiate abstract class Schedule with abstract method"
-        " due_donations"
         )
-    assert str(e.value) == exception_message
+    assert exception_message in str(e.value)
+    assert "due_donations" in str(e.value)
 
 
 def test_adhoc():
