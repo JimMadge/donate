@@ -11,7 +11,7 @@ def test_schedule():
         Schedule()
 
     exception_message = (
-        "Can't instantiate abstract class Schedule with abstract methods"
+        "Can't instantiate abstract class Schedule with abstract method"
         " due_donations"
         )
     assert str(e.value) == exception_message
