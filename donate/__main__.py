@@ -1,11 +1,9 @@
 from .configuration import parse_config
 from .ledger import update_ledger, ledger_stats
 from .logs import update_log
-from .maths import single_donation, donee_means, category_means
-from .schedule import AdHoc
+from .maths import single_donation, means_summary
+from .schedule import AdHoc, get_last_donation, update_last_donation
 import argparse
-from datetime import datetime
-from tabulate import tabulate
 from xdg import BaseDirectory
 
 
@@ -57,15 +55,15 @@ def main():
     # Get command line argumnets
     args = parser.parse_args()
 
-    # Get XDG configuration path
-    # This function has side effects; it ensures that the path exists
-    config_path = BaseDirectory.save_config_path("donate")
-
-    # Locate configuration file
-    if args.config:
-        config_file_path = args.config
-    else:
-        config_file_path = config_path + "/config.yml"
+    try:
+        config_file_path = (
+            args.config
+            or BaseDirectory.load_first_config("donate") + "/config.yaml"
+        )
+    except TypeError:
+        print("No configuration file specified and no file at "
+              f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
+        return
 
     # Parse configuration file
     with open(config_file_path, "r") as config_file:
@@ -84,27 +82,11 @@ def main():
 
     # If the means option has been declared, print means and exit
     if args.means:
-        print_means(donees, args.means, currency_symbol)
+        print(means_summary(donees, args.means, currency_symbol))
         return
 
-    # Read last donation
-    if args.ad_hoc:
-        last_donation = None
-    else:
-        last_donation_file_path = config_path + "/last_donation"
-        try:
-            with open(last_donation_file_path) as last_donation_file:
-                last_donation = datetime.fromisoformat(
-                        last_donation_file.read().strip()
-                        )
-        except FileNotFoundError:
-            last_donation = None
-
     # Determine number of donations due
-    if last_donation:
-        due_donations = schedule.due_donations(last_donation)
-    else:
-        due_donations = 1
+    due_donations = schedule.due_donations(get_last_donation())
 
     if not isinstance(schedule, AdHoc):
         if due_donations == 0:
@@ -132,29 +114,14 @@ def main():
     if args.dry_run:
         return
 
-    # Record of donation date
-    if not args.ad_hoc:
-        with open(last_donation_file_path, "w") as last_donation_file:
-            last_donation_file.write(datetime.today().isoformat()+"\n")
+    # Record donation date
+    update_last_donation()
 
     # Append donations to log
     update_log(individual_donations, currency_symbol, decimal_currency)
 
     # Update ledger
     update_ledger(individual_donations, decimal_currency)
-
-
-def print_means(donees, total_donation, currency_symbol):
-    print(f"Mean donations from {currency_symbol}{total_donation}")
-    print(tabulate(
-        donee_means(donees, total_donation),
-        headers=["Donee", "Mean donation"]
-        ))
-    print("\n")
-    print(tabulate(
-        category_means(donees, total_donation),
-        headers=["Category", "Mean donation"]
-        ))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,8 @@
 import donate
 from donate.maths import (weights, normalised_weights, single_donation, _means,
-                          donee_means, category_means)
+                          donee_means, category_means, means_summary)
 import pytest
+import re
 
 
 def test_weights(donees):
@@ -82,7 +83,14 @@ def test_means(donees):
 def test_donee_means(donees):
     means = donee_means(donees, 100)
 
+    expected_donees = [
+        "Favourite distro", "Favourite software", "Useful software",
+        "Podcast 1", "Podcast 2", "Podcast 3", "Podcast 4", "Charity",
+        "Token support"
+    ]
+
     assert [elem[1] for elem in means] == sorted(expected_means, reverse=True)
+    assert [elem[0] for elem in means] == expected_donees
 
 
 def test_category_means(donees):
@@ -93,3 +101,24 @@ def test_category_means(donees):
     assert means[1] == ("podcast", 32.25806451612903)
     assert means[2] == ("software", 27.41935483870968)
     assert means[3] == ("organisation", 8.064516129032258)
+
+
+def test_means_summary(donees):
+    means = means_summary(donees, 100, "£")
+
+    header, donee_means, category_means = means.rsplit("\n\n")
+
+    assert re.search(r"^Mean donations from £100$", header, re.MULTILINE)
+
+    assert re.search(r"^Donee\s+Mean donation$", donee_means, re.MULTILINE)
+    assert re.search(r"^Favourite distro\s+32.2581$", donee_means,
+                     re.MULTILINE)
+    assert re.search(r"^Favourite software\s+16.129$", donee_means,
+                     re.MULTILINE)
+
+    assert re.search(r"^Category\s+Mean donation$", category_means,
+                     re.MULTILINE)
+    assert re.search(r"^distribution\s+32.2581$", category_means,
+                     re.MULTILINE)
+    assert re.search(r"^podcast\s+32.2581$", category_means,
+                     re.MULTILINE)

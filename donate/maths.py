@@ -1,6 +1,7 @@
 """Mathematical and statistical operations."""
 from collections import Counter
 from random import choices
+from tabulate import tabulate
 
 
 def weights(donees):
@@ -101,3 +102,16 @@ def category_means(donees, total_donation):
 
     return sorted(category_means.items(), key=lambda item: item[1],
                   reverse=True)
+
+
+def means_summary(donees, total_donation, currency_symbol):
+    means = "\n".join([
+        f"Mean donations from {currency_symbol}{total_donation}",
+        "",
+        tabulate(donee_means(donees, total_donation),
+                 headers=["Donee", "Mean donation"]),
+        "",
+        tabulate(category_means(donees, total_donation),
+                 headers=["Category", "Mean donation"])
+    ])
+    return means

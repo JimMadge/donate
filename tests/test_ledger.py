@@ -1,5 +1,5 @@
 from collections import Counter
-import donate
+import donate.ledger
 from donate.ledger import (_ledger_path, _get_ledger, update_ledger,
                            ledger_stats)
 import json

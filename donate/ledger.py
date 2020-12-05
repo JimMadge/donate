@@ -45,14 +45,10 @@ def ledger_stats(currency_symbol):
     number = ledger["number"]
 
     stats = "\n".join([
-        tabulate(
-            list(total.items()),
-            headers=["Donee", f"Total / {currency_symbol}"]
-        ),
-        "\n",
-        tabulate(
-            list(number.items()),
-            headers=["Donee", "Number of donations"]
-        )
+        tabulate(list(total.items()),
+                 headers=["Donee", f"Total / {currency_symbol}"]),
+        "",
+        tabulate(list(number.items()),
+                 headers=["Donee", "Number of donations"])
     ])
     return stats

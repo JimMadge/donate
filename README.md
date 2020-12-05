@@ -60,7 +60,7 @@ Ensure `~/.local/bin` is in your `$PATH`.
 
 Donate needs to be configured before use Donate is configured with a single
 [YAML](https://yaml.org/) file. This files path should be
-`$XDG_CONFIG_HOME/donate/config.yml` (generally `~/.config/donate/config.yml`).
+`$XDG_CONFIG_HOME/donate/config.yaml` (generally `~/.config/donate/config.yaml`).
 
 The configuration file has the following top level keys
 
