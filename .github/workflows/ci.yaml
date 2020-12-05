@@ -28,10 +28,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: pip install setuptools wheel
+      - name: Setup poetry
+        uses: abatilo/actions-poetry@v2.0.0
       - name: Build
-        run: python ./setup.py bdist_wheel
+        run: poetry build -f wheel
 
   test:
     runs-on: ubuntu-latest
@@ -44,10 +44,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Setup poetry
+        uses: abatilo/actions-poetry@v2.0.0
       - name: Install dependencies
-        run: pip install -r requirements.txt -r requirements-dev.txt
+        run: poetry install
       - name: Test
-        run: pytest -v --cov=./donate --cov-report=xml
+        run: poetry run pytest -v --cov=./donate --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
