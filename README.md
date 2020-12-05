@@ -1,4 +1,5 @@
 # Donate
+
 ![CI](https://github.com/JimMadge/donate/workflows/CI/badge.svg)
 [![codecov](https://codecov.io/gh/JimMadge/donate/branch/master/graph/badge.svg)](https://codecov.io/gh/JimMadge/donate)
 
@@ -6,6 +7,7 @@ Generate donations to projects you want to support according to a distribution
 you control.
 
 ## About
+
 ### The Problem
 
 I want to donate to many (mostly software) projects which I like, use or depend
@@ -41,21 +43,8 @@ This system is certainly not perfect. Here are some problems I can see,
 - The amounts and regularity at which projects will receive donations is
   unpredictable which could make their financial planning more difficult
 
-## Installation
-### User Install Using Pip
-
-Clone the repository
-```
-$ git clone https://github.com/JimMadge/donate.git
-```
-Install using pip
-```
-$ cd doante
-$ pip install --user .
-```
-Ensure `~/.local/bin` is in your `$PATH`.
-
 ## Usage
+
 ### Configuration
 
 Donate needs to be configured before use Donate is configured with a single
