@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "donate"
+version = "0.7.1"
+description = "Generate donations to projects you want to support according to a distribution you control."
+authors = ["Jim Madge <jmmadge@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pyxdg = "*"
+pyyaml = "*"
+tabulate = "*"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+pytest-cov = "*"
+python-dateutil = "*"
+
+[tool.poetry.scripts]
+donate = "donate.__main__:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
