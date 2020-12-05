@@ -85,14 +85,8 @@ def main():
         print(means_summary(donees, args.means, currency_symbol))
         return
 
-    # Get time of last donation
-    last_donation = get_last_donation()
-
     # Determine number of donations due
-    if last_donation:
-        due_donations = schedule.due_donations(last_donation)
-    else:
-        due_donations = 1
+    due_donations = schedule.due_donations(get_last_donation())
 
     if not isinstance(schedule, AdHoc):
         if due_donations == 0:

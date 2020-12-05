@@ -13,8 +13,10 @@ class Schedule(ABC):
         Calculate how many donations are due based on the date of the last
         donation.
 
+        If `last_donation` is `None` this method should return 1.
+
         :arg last_donation: Time of the last donation.
-        :rtype last_donation: :class:`datetime.datetime`
+        :rtype last_donation: :class:`datetime.datetime` or NoneType
         """
 
 
@@ -29,6 +31,9 @@ class Monthly(Schedule):
     """Monthly schedule. One donation per calendar month."""
 
     def due_donations(self, last_donation):
+        if last_donation is None:
+            return 1
+
         date = datetime.today()
 
         elapsed_months = (
@@ -45,6 +50,7 @@ def _last_donation_path():
 
 
 def get_last_donation():
+    """Get the time of the last donation."""
     last_donation_path = _last_donation_path()
 
     try:
@@ -59,6 +65,7 @@ def get_last_donation():
 
 
 def update_last_donation():
+    """Write the current time to the last donation file."""
     last_donation_path = _last_donation_path()
 
     with open(last_donation_path, "w") as last_donation_file:
