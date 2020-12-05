@@ -55,15 +55,15 @@ def main():
     # Get command line argumnets
     args = parser.parse_args()
 
-    # Get XDG configuration path
-    # This function has side effects; it ensures that the path exists
-    config_path = BaseDirectory.save_config_path("donate")
-
-    # Locate configuration file
-    if args.config:
-        config_file_path = args.config
-    else:
-        config_file_path = config_path + "/config.yaml"
+    try:
+        config_file_path = (
+            args.config
+            or BaseDirectory.load_first_config("donate") + "/config.yaml"
+        )
+    except TypeError:
+        print("No configuration file specified and no file at "
+              f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
+        return
 
     # Parse configuration file
     with open(config_file_path, "r") as config_file:
