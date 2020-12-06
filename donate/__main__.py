@@ -7,7 +7,7 @@ import argparse
 from xdg import BaseDirectory
 
 
-def main():
+def create_parser():
     parser = argparse.ArgumentParser(
         description=("Generate donations to projects according to a"
                      " distribution you control")
@@ -52,7 +52,12 @@ def main():
             )
         )
 
+    return parser
+
+
+def main():
     # Get command line argumnets
+    parser = create_parser()
     args = parser.parse_args()
 
     try:
