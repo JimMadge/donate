@@ -73,27 +73,22 @@ def main():
     # Parse configuration file
     with open(config_file_path, "r") as config_file:
         config = parse_config(config_file)
-    donees = config["donees"]
-    total_donation = config["total_donation"]
-    split = config["split"]
-    currency_symbol = config["currency_symbol"]
-    decimal_currency = config["decimal_currency"]
-    schedule = config["schedule"]
 
     # If the stats option has been declared, print statistics and exit
     if args.stats:
-        print(ledger_stats(currency_symbol))
+        print(ledger_stats(config["currency_symbol"]))
         return
 
     # If the means option has been declared, print means and exit
     if args.means:
-        print(means_summary(donees, args.means, currency_symbol))
+        print(means_summary(config["donees"], args.means,
+                            config["currency_symbol"]))
         return
 
     # Determine number of donations due
-    due_donations = schedule.due_donations(get_last_donation())
+    due_donations = config["schedule"].due_donations(get_last_donation())
 
-    if not isinstance(schedule, AdHoc):
+    if not isinstance(config["schedule"], AdHoc):
         if due_donations == 0:
             print("No donations due")
             return
@@ -102,17 +97,17 @@ def main():
 
     # Get individual donations
     individual_donations = single_donation(
-        donees,
-        total_donation * due_donations,
-        split * due_donations,
-        decimal_currency
+        config["donees"],
+        config["total_donation"] * due_donations,
+        config["split"] * due_donations,
+        config["decimal_currency"]
         )
     for donee, amount in individual_donations.items():
-        if decimal_currency:
+        if config["decimal_currency"]:
             whole = amount // 100
             hundreths = amount % 100
             amount = f"{whole}.{hundreths:02d}"
-        print(f"{donee.name} -- {currency_symbol}{amount} -->"
+        print(f"{donee.name} -- {config['currency_symbol']}{amount} -->"
               f" {donee.donation_url}")
 
     # Return before updating any files if this is a dry run
@@ -123,10 +118,11 @@ def main():
     update_last_donation()
 
     # Append donations to log
-    update_log(individual_donations, currency_symbol, decimal_currency)
+    update_log(individual_donations, config["currency_symbol"],
+               config["decimal_currency"])
 
     # Update ledger
-    update_ledger(individual_donations, decimal_currency)
+    update_ledger(individual_donations, config["decimal_currency"])
 
 
 if __name__ == "__main__":
