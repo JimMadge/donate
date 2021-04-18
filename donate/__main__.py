@@ -40,15 +40,7 @@ def generate(
         )
     )
 ) -> None:
-    if config_path is None:
-        try:
-            config_path = (
-                BaseDirectory.load_first_config("donate") + "/config.yaml"
-            )
-        except TypeError:
-            print("No configuration file specified and no file at "
-                  f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
-            typer.Exit()
+    config_path = get_config_path(config_path)
 
     # Parse configuration file
     with open(config_path, "r") as config_text:
@@ -97,15 +89,7 @@ def generate(
 
 @app.command(help="Print some statistics about previous donations.")
 def stats(config_path: Optional[Path] = config_path_option) -> None:
-    if config_path is None:
-        try:
-            config_path = (
-                BaseDirectory.load_first_config("donate") + "/config.yaml"
-            )
-        except TypeError:
-            print("No configuration file specified and no file at "
-                  f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
-            typer.Exit()
+    config_path = get_config_path(config_path)
 
     # Parse configuration file
     with open(config_path, "r") as config_text:
@@ -123,15 +107,7 @@ def means(
     total_donation: int = typer.Argument(..., help="total donation"),
     config_path: Optional[Path] = config_path_option
 ) -> None:
-    if config_path is None:
-        try:
-            config_path = (
-                BaseDirectory.load_first_config("donate") + "/config.yaml"
-            )
-        except TypeError:
-            print("No configuration file specified and no file at "
-                  f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
-            typer.Exit()
+    config_path = get_config_path(config_path)
 
     # Parse configuration file
     with open(config_path, "r") as config_text:
@@ -141,6 +117,20 @@ def means(
         means_summary(config.donees, total_donation, config.currency_symbol)
     )
     typer.Exit()
+
+
+def get_config_path(path: Optional[Path]) -> Path:
+    if path is None:
+        try:
+            path = (
+                BaseDirectory.load_first_config("donate") + "/config.yaml"
+            )
+        except TypeError:
+            print("No configuration file specified and no file at "
+                  f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
+            typer.Exit()
+
+    return path
 
 
 def format_donations(donations: list[Donee], currency_symbol: str,
