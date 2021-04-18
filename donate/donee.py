@@ -6,3 +6,6 @@ class Donee(BaseModel):
     weight: float = Field(gt=0.)
     category: str = "other"
     url: str
+
+    def __hash__(self):
+        return hash(self.name)
