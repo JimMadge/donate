@@ -1,3 +1,4 @@
+from __future__ import annotations
 from .donee import Donee
 from .schedule import schedule_map
 from typing import Optional, Any
