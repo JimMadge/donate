@@ -2,6 +2,7 @@ from .donee import Donee
 from .schedule import schedule_map
 from typing import Optional, Any
 from pydantic import BaseModel, Field, validator
+from yaml import load
 
 
 class Weights(BaseModel):
@@ -38,7 +39,17 @@ class Configuration(BaseModel):
         return v
 
 
-def parse_config(config: dict[str, Any]) -> Configuration:
+def parse_config(config: str) -> Configuration:
+    try:
+        from yaml import CLoader as Loader
+    except ImportError:
+        from yaml import Loader
+
+    config_dict = load(config, Loader)
+    return parse_config_dict(config_dict)
+
+
+def parse_config_dict(config: dict[str, Any]) -> Configuration:
     weights = Weights(weights=config["weights"])
 
     # Convert named weights to their numerical value
