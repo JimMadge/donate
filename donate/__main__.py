@@ -15,12 +15,15 @@ from xdg import BaseDirectory
 app = typer.Typer()
 
 
+config_path_option = typer.Option(
+    None, "--config", "-c",
+    help="Specify a path to a non-default configuration file."
+)
+
+
 @app.command(help="Generate a set of donations.")
 def generate(
-    config_path: Optional[Path] = typer.Option(
-        None, "--config", "-c",
-        help="Specify a path to a non-default configuration file."
-    ),
+    config_path: Optional[Path] = config_path_option,
     ad_hoc: bool = typer.Option(
         False, "--ad-hoc", "-a",
         help=(
@@ -34,7 +37,7 @@ def generate(
         help=(
             "Generate sample donations but don't commit them to the donations"
             " ledger or update the last donation time."
-            )
+        )
     )
 ) -> None:
     if config_path is None:
@@ -73,7 +76,7 @@ def generate(
         config.total_donation * due_donations,
         config.split * due_donations,
         config.decimal_currency
-        )
+    )
     print(format_donations(individual_donations, config.currency_symbol,
                            config.decimal_currency))
 
@@ -93,12 +96,7 @@ def generate(
 
 
 @app.command(help="Print some statistics about previous donations.")
-def stats(
-    config_path: Optional[Path] = typer.Option(
-        None, "--config", "-c",
-        help="Specify a path to a non-default configuration file."
-    ),
-) -> None:
+def stats(config_path: Optional[Path] = config_path_option) -> None:
     if config_path is None:
         try:
             config_path = (
@@ -123,10 +121,7 @@ def stats(
 )
 def means(
     total_donation: int = typer.Argument(..., help="total donation"),
-    config_path: Optional[Path] = typer.Option(
-        None, "--config", "-c",
-        help="Specify a path to a non-default configuration file."
-    ),
+    config_path: Optional[Path] = config_path_option
 ) -> None:
     if config_path is None:
         try:
