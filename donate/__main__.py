@@ -1,4 +1,4 @@
-from .configuration import parse_config
+from .configuration import parse_config, Configuration
 from .donee import Donee
 from .ledger import update_ledger, ledger_stats
 from .logs import update_log
@@ -40,11 +40,7 @@ def generate(
         )
     )
 ) -> None:
-    config_path = get_config_path(config_path)
-
-    # Parse configuration file
-    with open(config_path, "r") as config_text:
-        config = parse_config(config_text)
+    config = get_config(check_config_path(config_path))
 
     # Create instance of schedule object
     if ad_hoc:
@@ -89,11 +85,7 @@ def generate(
 
 @app.command(help="Print some statistics about previous donations.")
 def stats(config_path: Optional[Path] = config_path_option) -> None:
-    config_path = get_config_path(config_path)
-
-    # Parse configuration file
-    with open(config_path, "r") as config_text:
-        config = parse_config(config_text)
+    config = get_config(check_config_path(config_path))
 
     typer.echo(ledger_stats(config.currency_symbol))
     typer.Exit()
@@ -107,11 +99,7 @@ def means(
     total_donation: int = typer.Argument(..., help="total donation"),
     config_path: Optional[Path] = config_path_option
 ) -> None:
-    config_path = get_config_path(config_path)
-
-    # Parse configuration file
-    with open(config_path, "r") as config_text:
-        config = parse_config(config_text)
+    config = get_config(check_config_path(config_path))
 
     typer.echo(
         means_summary(config.donees, total_donation, config.currency_symbol)
@@ -119,7 +107,13 @@ def means(
     typer.Exit()
 
 
-def get_config_path(path: Optional[Path]) -> Path:
+def get_config(config_path: Path) -> Configuration:
+    with open(config_path, "r") as config_text:
+        config = parse_config(config_text)
+    return config
+
+
+def check_config_path(path: Optional[Path]) -> Path:
     if path is None:
         try:
             path = (
