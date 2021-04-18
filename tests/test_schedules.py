@@ -17,6 +17,12 @@ def test_schedule():
     assert "due_donations" in str(e.value)
 
 
+@pytest.mark.parametrize("Schedule", [AdHoc, Monthly])
+def test_no_last_donation(Schedule):
+    schedule = Schedule()
+    assert schedule.due_donations(None) == 1
+
+
 def test_adhoc():
     s = AdHoc()
     last_donation = datetime.now()

@@ -5,10 +5,11 @@ from .maths import single_donation, means_summary
 from .schedule import (schedule_map, AdHoc, get_last_donation,
                        update_last_donation)
 import argparse
+from tabulate import tabulate
 from xdg import BaseDirectory
 
 
-def main():
+def create_parser():
     parser = argparse.ArgumentParser(
         description=("Generate donations to projects according to a"
                      " distribution you control")
@@ -53,7 +54,28 @@ def main():
             )
         )
 
+    return parser
+
+
+def format_donations(donations, currency_symbol, decimal_currency):
+    table = []
+    for donee, amount in donations.items():
+        if decimal_currency:
+            whole = amount // 100
+            hundreths = amount % 100
+            amount = f"{whole}.{hundreths:02d}"
+
+        amount = f"{currency_symbol}{amount}"
+        table.append((donee.name, amount, donee.url))
+
+    return tabulate(
+        sorted(table, key=lambda item: float(item[1][1:]), reverse=True)
+    )
+
+
+def main():
     # Get command line argumnets
+    parser = create_parser()
     args = parser.parse_args()
 
     try:
@@ -103,13 +125,8 @@ def main():
         config.split * due_donations,
         config.decimal_currency
         )
-    for donee, amount in individual_donations.items():
-        if config.decimal_currency:
-            whole = amount // 100
-            hundreths = amount % 100
-            amount = f"{whole}.{hundreths:02d}"
-        print(f"{donee.name} -- {config.currency_symbol}{amount} -->"
-              f" {donee.url}")
+    print(format_donations(individual_donations, config.currency_symbol,
+                           config.decimal_currency))
 
     # Return before updating any files if this is a dry run
     if args.dry_run:
