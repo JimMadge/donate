@@ -11,6 +11,7 @@ pydantic = "*"
 pyxdg = "*"
 pyyaml = "*"
 tabulate = "*"
+typer = "^0.3.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
