@@ -1,128 +1,64 @@
-"""Configuration parsing."""
 from .donee import Donee
-from .schedule import AdHoc, Monthly
+from .schedule import schedule_map
+from typing import Optional, Any
+from pydantic import BaseModel, Field, validator
 from yaml import load
 
-_required_keys = ["total_donation", "split", "donees"]
 
-_schedule_map = {
-    "ad hoc": AdHoc,
-    "monthly": Monthly
-    }
+class Weights(BaseModel):
+    weights: dict[str, float] = {}
+
+    @validator("weights", each_item=True)
+    def ensure_positive(cls, v):
+        if v <= 0:
+            raise ValueError("Weights must be positive")
+        return v
+
+    def __getitem__(self, key):
+        return self.weights[key]
+
+    def keys(self):
+        return self.weights.keys()
 
 
-def parse_config(config_yaml):
+class Configuration(BaseModel):
+    total_donation: int = Field(gt=0)
+    split: int = Field(gt=0)
+
+    currency_symbol: Optional[str] = Field("£", min_length=1, max_length=1)
+    decimal_currency: Optional[bool] = False
+
+    schedule: str = "ad hoc"
+
+    donees: Optional[list[Donee]] = None
+
+    @validator("schedule")
+    def schedule_exists(cls, v):
+        if v not in schedule_map.keys():
+            raise ValueError(f"Schedule '{v}' is not valid")
+        return v
+
+
+def parse_config(config: str) -> Configuration:
     try:
         from yaml import CLoader as Loader
     except ImportError:
         from yaml import Loader
 
-    config = load(config_yaml, Loader)
-
-    keys = config.keys()
-
-    # Check required keys
-    for key in _required_keys:
-        if key not in keys:
-            raise ConfigurationError(f"Required key '{key}' not declared")
-
-    # Ensure decimal currency is a boolean value if present
-    if "decimal_currency" in keys:
-        if type(config["decimal_currency"]) is not bool:
-            raise ConfigurationError("'decimal_currency' must be a boolean")
-    else:
-        config["decimal_currency"] = False
-
-    # Set currency if one is not declared symbol
-    if "currency_symbol" not in keys:
-        config["currency_symbol"] = "£"
-
-    # Set schedule
-    if "schedule" not in keys:
-        config["schedule"] = AdHoc()
-    else:
-        if config["schedule"] not in _schedule_map.keys():
-            raise ConfigurationError(
-                f"Schedule must be one of '{', '.join(_schedule_map.keys())}'"
-                )
-
-        config["schedule"] = _schedule_map[config["schedule"]]()
-
-    # Ensure donees is a list
-    if type(config["donees"]) is not list:
-        raise ConfigurationError("Donees must be a list")
-
-    # Ensure weights are numbers if declared
-    if "weights" in keys:
-        weight_dict = config["weights"]
-        for name, value in weight_dict.items():
-            if type(value) not in [int, float]:
-                raise ConfigurationError(
-                    f"Weight '{name}' value '{value}' is not a real number."
-                    )
-            elif value < 0:
-                raise ConfigurationError(
-                    f"Weight '{name}' value '{value}' is negative."
-                    )
-    else:
-        weight_dict = None
-
-    # Process donees
-    donees = []
-    for donee_dict in config["donees"]:
-        donees.append(_parse_donee(donee_dict, weight_dict))
-    config["donees"] = donees
-
-    return config
+    config_dict = load(config, Loader)
+    return parse_config_dict(config_dict)
 
 
-def _parse_donee(donee_dict, weight_dict):
-    name = donee_dict["name"]
+def parse_config_dict(config: dict[str, Any]) -> Configuration:
+    weights = Weights(weights=config["weights"])
 
-    # Process weight argument
-    weight = donee_dict["weight"]
-    if (weight_type := type(weight)) is str:
-        # If weight is a string, ensure weight keywords have been declared
-        if weight_dict is None:
-            raise ConfigurationError(
-                f"The weight of donee '{name}' is a string, but"
-                " no weights have been defined."
-                )
+    # Convert named weights to their numerical value
+    for donee in config["donees"]:
+        if isinstance(donee["weight"], str):
+            weight_string = donee["weight"]
+            assert weight_string in weights.keys()
+            donee["weight"] = weights[weight_string]
 
-        try:
-            weight = weight_dict[weight]
-        except KeyError:
-            raise ConfigurationError(
-                f"Weight '{weight}' of donee '{name}' not"
-                " defined"
-                )
-    elif weight_type is int:
-        weight = float(weight)
-    elif weight_type is float:
-        weight = weight
+    configuration = Configuration(**config)
 
-    if weight < 0:
-        raise ConfigurationError(
-            f"Weight '{weight}' of donee '{name}' is negative"
-            )
-
-    if "category" in donee_dict.keys():
-        category = donee_dict["category"]
-        if type(category) is not str:
-            raise ConfigurationError(
-                f"Category '{category}' of donee '{name}' is not a string."
-            )
-    else:
-        category = "other"
-
-    return Donee(
-        name=name,
-        weight=weight,
-        category=category.lower(),
-        donation_url=donee_dict["url"]
-        )
-
-
-class ConfigurationError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    return configuration

@@ -22,6 +22,7 @@ class Schedule(ABC):
 
 class AdHoc(Schedule):
     """Add hoc schedule. Donate whenever you want to."""
+    friendly_name = "ad hoc"
 
     def due_donations(self, last_donation):
         return 1
@@ -29,6 +30,7 @@ class AdHoc(Schedule):
 
 class Monthly(Schedule):
     """Monthly schedule. One donation per calendar month."""
+    friendly_name = "monthly"
 
     def due_donations(self, last_donation):
         if last_donation is None:
@@ -42,6 +44,9 @@ class Monthly(Schedule):
             )
 
         return elapsed_months
+
+
+schedule_map = {cls.friendly_name: cls for cls in Schedule.__subclasses__()}
 
 
 def _last_donation_path():
