@@ -109,11 +109,11 @@ donees:
 To generate a set of donations
 
 ```
-$ donate
+$ donate generate
 ```
 
 To see more command line options
 
 ```
-$ donate -h
+$ donate --help
 ```
