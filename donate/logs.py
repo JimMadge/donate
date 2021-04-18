@@ -1,7 +1,7 @@
 from csv import writer
 from datetime import date
 from pathlib import Path
-from xdg import BaseDirectory
+from xdg import BaseDirectory  # type: ignore
 
 
 def _log_path():

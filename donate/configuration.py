@@ -25,8 +25,8 @@ class Configuration(BaseModel):
     total_donation: int = Field(gt=0)
     split: int = Field(gt=0)
 
-    currency_symbol: Optional[str] = Field("£", min_length=1, max_length=1)
-    decimal_currency: Optional[bool] = False
+    currency_symbol: str = Field("£", min_length=1, max_length=1)
+    decimal_currency: bool = False
 
     schedule: str = "ad hoc"
 
@@ -43,7 +43,7 @@ def parse_config(config: str) -> Configuration:
     try:
         from yaml import CLoader as Loader
     except ImportError:
-        from yaml import Loader
+        from yaml import Loader  # type: ignore
 
     config_dict = load(config, Loader)
     return parse_config_dict(config_dict)

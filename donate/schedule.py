@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from xdg import BaseDirectory
+from typing import Type
+from xdg import BaseDirectory  # type: ignore
 
 
 class Schedule(ABC):
     """Schedule base class."""
+    friendly_name = ""
 
     @abstractmethod
     def due_donations(self, last_donation):
@@ -46,7 +48,14 @@ class Monthly(Schedule):
         return elapsed_months
 
 
-schedule_map = {cls.friendly_name: cls for cls in Schedule.__subclasses__()}
+# Raises and error with mypy
+# schedule_map: dict[str, Type[Schedule]] = {
+#     cls.friendly_name: cls for cls in Schedule.__subclasses__()
+# }
+schedule_map: dict[str, Type[Schedule]] = {
+    "ad hoc": AdHoc,
+    "monthly": Monthly
+}
 
 
 def _last_donation_path():

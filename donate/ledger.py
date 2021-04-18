@@ -2,7 +2,7 @@ from collections import Counter
 import json
 from pathlib import Path
 from tabulate import tabulate
-from xdg import BaseDirectory
+from xdg import BaseDirectory  # type: ignore
 
 
 def _ledger_path():
