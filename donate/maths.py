@@ -1,15 +1,16 @@
 """Mathematical and statistical operations."""
-from collections import Counter
+from .donee import Donee
+from collections import Counter, defaultdict
 from random import choices
 from tabulate import tabulate
 
 
-def weights(donees):
+def weights(donees: list[Donee]) -> list[float]:
     """Get weights from donees."""
     return [donee.weight for donee in donees]
 
 
-def normalised_weights(donees):
+def normalised_weights(donees: list[Donee]) -> list[float]:
     """Calculate the normalised weights of each donee."""
 
     n_weights = weights(donees)
@@ -19,20 +20,9 @@ def normalised_weights(donees):
     return n_weights
 
 
-def single_donation(donees, total_donation, split, decimal_currency=False):
-    """
-    Generate a single donation.
-
-    :arg donees: List of donees.
-    :type donees: list(:class:`Donee`)
-    :arg int total_donation: Total donation amount.
-    :arg int split: Number of donees to split the total donation between.
-    :arg bool decimal_currency: If `True` allow splitting individual donations
-        into hundredths. Default: `False`.
-
-    :returns: Dictionary of each donee and their donation amount.
-    :rtype: :class:`collections.Counter`
-    """
+def single_donation(donees: list[Donee], total_donation: int, split: int,
+                    decimal_currency: bool = False) -> Counter[Donee]:
+    """Generate a single donation."""
     # When using a decimal currency allow spliting donations into hundreths
     if decimal_currency:
         total_donation *= 100
@@ -52,51 +42,33 @@ def single_donation(donees, total_donation, split, decimal_currency=False):
         k=split
         )
 
-    individual_donations = Counter()
+    individual_donations: Counter[Donee] = Counter()
     for donee in selected:
         individual_donations[donee] += individual_donation
 
     return individual_donations
 
 
-def _means(donees, total_donation):
+def _means(donees: list[Donee], total_donation: int) -> list[float]:
     weights = normalised_weights(donees)
     return [weight * total_donation for weight in weights]
 
 
-def donee_means(donees, total_donation):
-    """
-    Calculate the mean donation received by each donee.
-
-    :arg donees: List of donees.
-    :type donees: list(:class:`Donee`)
-    :arg int total_donation: Total donation amount.
-
-    :returns: A list of donees and the mean donation received sorted by the
-        donation amount.
-    :rtype: list(tuple(str, float))
-    """
+def donee_means(donees: list[Donee],
+                total_donation: int) -> list[tuple[str, float]]:
+    """Calculate the mean donation received by each donee."""
     names = [donee.name for donee in donees]
     means = _means(donees, total_donation)
     return sorted(list(zip(names, means)), key=lambda elem: elem[1],
                   reverse=True)
 
 
-def category_means(donees, total_donation):
-    """
-    Calculate the mean donation received by each category of donee.
-
-    :arg donees: List of donees.
-    :type donees: list(:class:`Donee`)
-    :arg int total_donation: Total donation amount.
-
-    :returns: A list of categories and the mean donation received sorted by the
-        donation amount.
-    :rtype: list(tuple(str, float))
-    """
+def category_means(donees: list[Donee],
+                   total_donation: int) -> list[tuple[str, float]]:
+    """Calculate the mean donation received by each category of donee."""
     means = _means(donees, total_donation)
 
-    category_means = Counter()
+    category_means: defaultdict[str, float] = defaultdict(float)
     for donee, mean in zip(donees, means):
         category_means[donee.category] += mean
 
@@ -104,7 +76,9 @@ def category_means(donees, total_donation):
                   reverse=True)
 
 
-def means_summary(donees, total_donation, currency_symbol):
+def means_summary(donees: list[Donee], total_donation: int,
+                  currency_symbol: str) -> str:
+    """Create tables summarising mean donations for donees and categories."""
     means = "\n".join([
         f"Mean donations from {currency_symbol}{total_donation}",
         "",
