@@ -139,7 +139,7 @@ def format_donations(donations: dict[Donee, int], currency_symbol: str,
         else:
             amount_str = f"{amount}"
 
-        amount_str = f"{currency_symbol}{amount}"
+        amount_str = f"{currency_symbol}{amount_str}"
         table.append((donee.name, amount_str, donee.url))
 
     return tabulate(
