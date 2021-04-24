@@ -50,27 +50,13 @@ def test_ledger(monkeypatch, mock_ledger_path):
 def test_update_empty_ledger(monkeypatch, donations, mock_ledger_path):
     monkeypatch.setattr(donate.ledger, "_ledger_path", mock_ledger_path)
 
-    update_ledger(donations, decimal_currency=False)
+    update_ledger(donations)
 
     with open(mock_ledger_path(), "r") as ledger_file:
         ledger = json.load(ledger_file)
 
     assert ledger["total"]["Favourite distro"] == 100
     assert ledger["total"]["Favourite software"] == 50
-    assert ledger["number"]["Favourite distro"] == 1
-    assert ledger["number"]["Favourite software"] == 1
-
-
-def test_update_empty_ledger_decimal(monkeypatch, donations, mock_ledger_path):
-    monkeypatch.setattr(donate.ledger, "_ledger_path", mock_ledger_path)
-
-    update_ledger(donations, decimal_currency=True)
-
-    with open(mock_ledger_path(), "r") as ledger_file:
-        ledger = json.load(ledger_file)
-
-    assert ledger["total"]["Favourite distro"] == 1.0
-    assert ledger["total"]["Favourite software"] == 0.5
     assert ledger["number"]["Favourite distro"] == 1
     assert ledger["number"]["Favourite software"] == 1
 
@@ -89,7 +75,7 @@ def test_update_ledger(monkeypatch, donees, donations, mock_ledger_path):
     monkeypatch.setattr(donate.ledger, "_ledger_path", mock_ledger_path)
     monkeypatch.setattr(donate.ledger, "_get_ledger", mock_get_ledger)
 
-    update_ledger(donations, decimal_currency=False)
+    update_ledger(donations)
 
     with open(mock_ledger_path(), "r") as ledger_file:
         ledger = json.load(ledger_file)
@@ -111,13 +97,36 @@ def test_ledger_stats(monkeypatch):
 
     monkeypatch.setattr(donate.ledger, "_get_ledger", mock_get_ledger)
 
-    stats = ledger_stats("£")
+    stats = ledger_stats("£", decimal_currency=False)
     # Split the total donation and number of donation parts
     total_stats, number_stats = stats.rsplit("\n\n")
 
     assert re.match(r"^Donee\s+Total / £$", total_stats, re.MULTILINE)
     assert re.search(r"^a\s+50$", total_stats, re.MULTILINE)
     assert re.search(r"^b\s+30$", total_stats, re.MULTILINE)
+
+    assert re.match(r"^Donee\s+Number of donations", number_stats,
+                    re.MULTILINE)
+    assert re.search(r"^a\s+5$", number_stats, re.MULTILINE)
+    assert re.search(r"^b\s+2$", number_stats, re.MULTILINE)
+
+
+def test_ledger_stats_decimal(monkeypatch):
+    def mock_get_ledger():
+        return {
+            "total": {"a": 5050, "b": 3000},
+            "number": {"a": 5, "b": 2}
+        }
+
+    monkeypatch.setattr(donate.ledger, "_get_ledger", mock_get_ledger)
+
+    stats = ledger_stats("£", decimal_currency=True)
+    # Split the total donation and number of donation parts
+    total_stats, number_stats = stats.rsplit("\n\n")
+
+    assert re.match(r"^Donee\s+Total / £$", total_stats, re.MULTILINE)
+    assert re.search(r"^a\s+50.50$", total_stats, re.MULTILINE)
+    assert re.search(r"^b\s+30.00$", total_stats, re.MULTILINE)
 
     assert re.match(r"^Donee\s+Number of donations", number_stats,
                     re.MULTILINE)

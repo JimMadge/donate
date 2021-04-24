@@ -2,7 +2,7 @@ from .configuration import parse_config, Configuration
 from .donee import Donee
 from .ledger import update_ledger, ledger_stats
 from .logs import update_log
-from .maths import single_donation, means_summary
+from .maths import split_decimal, single_donation, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
 from pathlib import Path
@@ -80,14 +80,14 @@ def generate(
                config.decimal_currency)
 
     # Update ledger
-    update_ledger(individual_donations, config.decimal_currency)
+    update_ledger(individual_donations)
 
 
 @app.command(help="Print some statistics about previous donations.")
 def stats(config_path: Optional[Path] = config_path_option) -> None:
     config = get_config(check_config_path(config_path))
 
-    typer.echo(ledger_stats(config.currency_symbol))
+    typer.echo(ledger_stats(config.currency_symbol, config.decimal_currency))
     typer.Exit()
 
 
@@ -133,8 +133,7 @@ def format_donations(donations: dict[Donee, int], currency_symbol: str,
     table: list[tuple[str, str, str]] = []
     for donee, amount in donations.items():
         if decimal_currency:
-            whole: int = amount // 100
-            hundreths: int = amount % 100
+            whole, hundreths = split_decimal(amount)
             amount_str: str = f"{whole}.{hundreths:02d}"
         else:
             amount_str = f"{amount}"

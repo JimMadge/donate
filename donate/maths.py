@@ -5,6 +5,13 @@ from random import choices
 from tabulate import tabulate
 
 
+def split_decimal(amount: int) -> tuple[int, int]:
+    """Split a decimal currency into who an hundreths."""
+    whole = amount // 100
+    hundreths = amount % 100
+    return whole, hundreths
+
+
 def weights(donees: list[Donee]) -> list[float]:
     """Get weights from donees."""
     return [donee.weight for donee in donees]
@@ -83,9 +90,9 @@ def means_summary(donees: list[Donee], total_donation: int,
         f"Mean donations from {currency_symbol}{total_donation}",
         "",
         tabulate(donee_means(donees, total_donation),
-                 headers=["Donee", "Mean donation"]),
+                 headers=["Donee", f"Mean donation / {currency_symbol}"]),
         "",
         tabulate(category_means(donees, total_donation),
-                 headers=["Category", "Mean donation"])
+                 headers=["Category", f"Mean donation / {currency_symbol}"])
     ])
     return means

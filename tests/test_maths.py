@@ -110,13 +110,13 @@ def test_means_summary(donees):
 
     assert re.search(r"^Mean donations from £100$", header, re.MULTILINE)
 
-    assert re.search(r"^Donee\s+Mean donation$", donee_means, re.MULTILINE)
+    assert re.search(r"^Donee\s+Mean donation / £$", donee_means, re.MULTILINE)
     assert re.search(r"^Favourite distro\s+32.2581$", donee_means,
                      re.MULTILINE)
     assert re.search(r"^Favourite software\s+16.129$", donee_means,
                      re.MULTILINE)
 
-    assert re.search(r"^Category\s+Mean donation$", category_means,
+    assert re.search(r"^Category\s+Mean donation / £$", category_means,
                      re.MULTILINE)
     assert re.search(r"^distribution\s+32.2581$", category_means,
                      re.MULTILINE)
