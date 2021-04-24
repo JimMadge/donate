@@ -1,15 +1,18 @@
 [tool.poetry]
 name = "donate"
-version = "0.7.1"
+version = "0.8.0"
 description = "Generate donations to projects you want to support according to a distribution you control."
 authors = ["Jim Madge <jmmadge@gmail.com>"]
-license = "MIT"
+license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+pydantic = "*"
 pyxdg = "*"
 pyyaml = "*"
 tabulate = "*"
+typer = "^0.3.2"
+mypy = "^0.812"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

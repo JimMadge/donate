@@ -1,89 +1,52 @@
-from .configuration import parse_config
+from .configuration import parse_config, Configuration
+from .donee import Donee
 from .ledger import update_ledger, ledger_stats
 from .logs import update_log
-from .maths import single_donation, means_summary
-from .schedule import AdHoc, get_last_donation, update_last_donation
-import argparse
-from xdg import BaseDirectory
+from .maths import split_decimal, single_donation, means_summary
+from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
+                       update_last_donation)
+from pathlib import Path
+from tabulate import tabulate
+import typer
+from typing import Optional
+from xdg import BaseDirectory  # type: ignore
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description=("Generate donations to projects according to a"
-                     " distribution you control")
-        )
+app = typer.Typer()
 
-    # Declare command line arguments
-    parser.add_argument(
-        "-c", "--config",
-        action="store",
-        type=str,
-        help="Specify a path to a non-default configuration file."
-        )
-    parser.add_argument(
-        "-a", "--ad-hoc",
-        action="store_true",
+
+config_path_option = typer.Option(
+    None, "--config", "-c",
+    help="Specify a path to a non-default configuration file."
+)
+
+
+@app.command(help="Generate a set of donations.")
+def generate(
+    config_path: Optional[Path] = config_path_option,
+    ad_hoc: bool = typer.Option(
+        False, "--ad-hoc", "-a",
         help=(
             "Make an ad hoc donation, i.e. ignore your donation schedule and"
             " last donation date. Useful in combination with '--dry-run' for"
             " testing."
-            )
         )
-    parser.add_argument(
-        "-d", "--dry-run",
-        action="store_true",
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", "-d",
         help=(
             "Generate sample donations but don't commit them to the donations"
             " ledger or update the last donation time."
-            )
         )
-    parser.add_argument(
-        "-s", "--stats",
-        action="store_true",
-        help="Print some statistics about previous donations."
-        )
-    parser.add_argument(
-        "-m", "--means",
-        action="store",
-        type=int,
-        help=(
-            "Print the mean donation recieved by each donee and donee category"
-            " from a total donation of MEANS"
-            )
-        )
+    )
+) -> None:
+    config = get_config(check_config_path(config_path))
 
-    # Get command line argumnets
-    args = parser.parse_args()
-
-    try:
-        config_file_path = (
-            args.config
-            or BaseDirectory.load_first_config("donate") + "/config.yaml"
-        )
-    except TypeError:
-        print("No configuration file specified and no file at "
-              f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
-        return
-
-    # Parse configuration file
-    with open(config_file_path, "r") as config_file:
-        config = parse_config(config_file)
-    donees = config["donees"]
-    total_donation = config["total_donation"]
-    split = config["split"]
-    currency_symbol = config["currency_symbol"]
-    decimal_currency = config["decimal_currency"]
-    schedule = config["schedule"]
-
-    # If the stats option has been declared, print statistics and exit
-    if args.stats:
-        print(ledger_stats(currency_symbol))
-        return
-
-    # If the means option has been declared, print means and exit
-    if args.means:
-        print(means_summary(donees, args.means, currency_symbol))
-        return
+    # Create instance of schedule object
+    if ad_hoc:
+        schedule: Schedule = AdHoc()
+    else:
+        schedule = schedule_map[config.schedule]()
 
     # Determine number of donations due
     due_donations = schedule.due_donations(get_last_donation())
@@ -97,31 +60,97 @@ def main():
 
     # Get individual donations
     individual_donations = single_donation(
-        donees,
-        total_donation * due_donations,
-        split * due_donations,
-        decimal_currency
-        )
-    for donee, amount in individual_donations.items():
-        if decimal_currency:
-            whole = amount // 100
-            hundreths = amount % 100
-            amount = f"{whole}.{hundreths:02d}"
-        print(f"{donee.name} -- {currency_symbol}{amount} -->"
-              f" {donee.donation_url}")
+        config.donees,
+        config.total_donation * due_donations,
+        config.split * due_donations,
+        config.decimal_currency
+    )
+    print(format_donations(individual_donations, config.currency_symbol,
+                           config.decimal_currency))
 
     # Return before updating any files if this is a dry run
-    if args.dry_run:
-        return
+    if dry_run:
+        typer.Exit()
 
     # Record donation date
     update_last_donation()
 
     # Append donations to log
-    update_log(individual_donations, currency_symbol, decimal_currency)
+    update_log(individual_donations, config.currency_symbol,
+               config.decimal_currency)
 
     # Update ledger
-    update_ledger(individual_donations, decimal_currency)
+    update_ledger(individual_donations)
+
+
+@app.command(help="Print some statistics about previous donations.")
+def stats(config_path: Optional[Path] = config_path_option) -> None:
+    config = get_config(check_config_path(config_path))
+
+    typer.echo(ledger_stats(config.currency_symbol, config.decimal_currency))
+    typer.Exit()
+
+
+@app.command(
+    help=("Print the mean donation received by each donee and donee category"
+          " from a total donation of MEANS")
+)
+def means(
+    total_donation: int = typer.Argument(..., help="total donation"),
+    config_path: Optional[Path] = config_path_option
+) -> None:
+    config = get_config(check_config_path(config_path))
+
+    typer.echo(
+        means_summary(config.donees, total_donation, config.currency_symbol)
+    )
+    typer.Exit()
+
+
+def get_config(config_path: Path) -> Configuration:
+    with open(config_path, "r") as config_text:
+        config = parse_config(config_text.read())
+    return config
+
+
+def check_config_path(path: Optional[Path]) -> Path:
+    if path is None:
+        try:
+            path = (
+                BaseDirectory.load_first_config("donate") + "/config.yaml"
+            )
+        except TypeError:
+            print("No configuration file specified and no file at "
+                  f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
+            typer.Exit()
+            exit()  # mypy doesn't know typer.Exit() will terminate
+
+    return path
+
+
+def format_donations(donations: dict[Donee, int], currency_symbol: str,
+                     decimal_currency: bool) -> str:
+    table: list[tuple[str, str, str]] = []
+    for donee, amount in donations.items():
+        if decimal_currency:
+            whole, hundreths = split_decimal(amount)
+            amount_str: str = f"{whole}.{hundreths:02d}"
+        else:
+            amount_str = f"{amount}"
+
+        amount_str = f"{currency_symbol}{amount_str}"
+        table.append((donee.name, amount_str, donee.url))
+
+    return tabulate(
+        sorted(
+            table,
+            key=lambda item: float(item[1][1:]),  # type: ignore
+            reverse=True)
+    )
+
+
+def main() -> None:
+    app()
 
 
 if __name__ == "__main__":

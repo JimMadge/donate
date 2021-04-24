@@ -1,36 +1,37 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from xdg import BaseDirectory
+from typing import Type, Optional
+from xdg import BaseDirectory  # type: ignore
 
 
 class Schedule(ABC):
     """Schedule base class."""
+    friendly_name = ""
 
     @abstractmethod
-    def due_donations(self, last_donation):
+    def due_donations(self, last_donation: Optional[datetime]) -> int:
         """
         Calculate how many donations are due based on the date of the last
         donation.
 
         If `last_donation` is `None` this method should return 1.
-
-        :arg last_donation: Time of the last donation.
-        :rtype last_donation: :class:`datetime.datetime` or NoneType
         """
 
 
 class AdHoc(Schedule):
     """Add hoc schedule. Donate whenever you want to."""
+    friendly_name = "ad hoc"
 
-    def due_donations(self, last_donation):
+    def due_donations(self, last_donation: Optional[datetime]) -> int:
         return 1
 
 
 class Monthly(Schedule):
     """Monthly schedule. One donation per calendar month."""
+    friendly_name = "monthly"
 
-    def due_donations(self, last_donation):
+    def due_donations(self, last_donation: Optional[datetime]) -> int:
         if last_donation is None:
             return 1
 
@@ -44,15 +45,26 @@ class Monthly(Schedule):
         return elapsed_months
 
 
-def _last_donation_path():
+# Raises and error with mypy
+# schedule_map: dict[str, Type[Schedule]] = {
+#     cls.friendly_name: cls for cls in Schedule.__subclasses__()
+# }
+schedule_map: dict[str, Type[Schedule]] = {
+    "ad hoc": AdHoc,
+    "monthly": Monthly
+}
+
+
+def _last_donation_path() -> Path:
     data_path = Path(BaseDirectory.save_data_path("donate"))
     return data_path / "last_donation"
 
 
-def get_last_donation():
+def get_last_donation() -> Optional[datetime]:
     """Get the time of the last donation."""
     last_donation_path = _last_donation_path()
 
+    last_donation: Optional[datetime]
     try:
         with open(last_donation_path) as last_donation_file:
             last_donation = datetime.fromisoformat(
@@ -64,7 +76,7 @@ def get_last_donation():
     return last_donation
 
 
-def update_last_donation():
+def update_last_donation() -> None:
     """Write the current time to the last donation file."""
     last_donation_path = _last_donation_path()
 
