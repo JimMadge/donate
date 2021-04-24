@@ -1,6 +1,6 @@
 from .donee import Donee
 from .schedule import schedule_map
-from typing import Optional, Any
+from typing import Optional, Any, KeysView
 from pydantic import BaseModel, Field, validator
 from yaml import load
 
@@ -9,15 +9,15 @@ class Weights(BaseModel):
     weights: dict[str, float] = {}
 
     @validator("weights", each_item=True)
-    def ensure_positive(cls, v):
+    def ensure_positive(cls, v: float) -> float:
         if v <= 0:
             raise ValueError("Weights must be positive")
         return v
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> float:
         return self.weights[key]
 
-    def keys(self):
+    def keys(self) -> KeysView[str]:
         return self.weights.keys()
 
 
@@ -33,7 +33,7 @@ class Configuration(BaseModel):
     donees: Optional[list[Donee]] = None
 
     @validator("schedule")
-    def schedule_exists(cls, v):
+    def schedule_exists(cls, v: str) -> str:
         if v not in schedule_map.keys():
             raise ValueError(f"Schedule '{v}' is not valid")
         return v
