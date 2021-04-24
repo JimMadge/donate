@@ -1,6 +1,6 @@
 from .donee import Donee
 from .schedule import schedule_map
-from typing import Optional, Any, KeysView
+from typing import Any, KeysView
 from pydantic import BaseModel, Field, validator
 from yaml import load
 
@@ -30,7 +30,7 @@ class Configuration(BaseModel):
 
     schedule: str = "ad hoc"
 
-    donees: Optional[list[Donee]] = None
+    donees: list[Donee]
 
     @validator("schedule")
     def schedule_exists(cls, v: str) -> str:
