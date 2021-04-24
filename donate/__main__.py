@@ -2,14 +2,14 @@ from .configuration import parse_config, Configuration
 from .donee import Donee
 from .ledger import update_ledger, ledger_stats
 from .logs import update_log
-from .maths import single_donation, means_summary
-from .schedule import (schedule_map, AdHoc, get_last_donation,
+from .maths import split_decimal, single_donation, means_summary
+from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
 from pathlib import Path
 from tabulate import tabulate
 import typer
 from typing import Optional
-from xdg import BaseDirectory
+from xdg import BaseDirectory  # type: ignore
 
 
 app = typer.Typer()
@@ -44,7 +44,7 @@ def generate(
 
     # Create instance of schedule object
     if ad_hoc:
-        schedule = AdHoc()
+        schedule: Schedule = AdHoc()
     else:
         schedule = schedule_map[config.schedule]()
 
@@ -80,14 +80,14 @@ def generate(
                config.decimal_currency)
 
     # Update ledger
-    update_ledger(individual_donations, config.decimal_currency)
+    update_ledger(individual_donations)
 
 
 @app.command(help="Print some statistics about previous donations.")
 def stats(config_path: Optional[Path] = config_path_option) -> None:
     config = get_config(check_config_path(config_path))
 
-    typer.echo(ledger_stats(config.currency_symbol))
+    typer.echo(ledger_stats(config.currency_symbol, config.decimal_currency))
     typer.Exit()
 
 
@@ -109,7 +109,7 @@ def means(
 
 def get_config(config_path: Path) -> Configuration:
     with open(config_path, "r") as config_text:
-        config = parse_config(config_text)
+        config = parse_config(config_text.read())
     return config
 
 
@@ -123,24 +123,29 @@ def check_config_path(path: Optional[Path]) -> Path:
             print("No configuration file specified and no file at "
                   f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
             typer.Exit()
+            exit()  # mypy doesn't know typer.Exit() will terminate
 
     return path
 
 
-def format_donations(donations: list[Donee], currency_symbol: str,
+def format_donations(donations: dict[Donee, int], currency_symbol: str,
                      decimal_currency: bool) -> str:
-    table = []
+    table: list[tuple[str, str, str]] = []
     for donee, amount in donations.items():
         if decimal_currency:
-            whole = amount // 100
-            hundreths = amount % 100
-            amount = f"{whole}.{hundreths:02d}"
+            whole, hundreths = split_decimal(amount)
+            amount_str: str = f"{whole}.{hundreths:02d}"
+        else:
+            amount_str = f"{amount}"
 
-        amount = f"{currency_symbol}{amount}"
-        table.append((donee.name, amount, donee.url))
+        amount_str = f"{currency_symbol}{amount_str}"
+        table.append((donee.name, amount_str, donee.url))
 
     return tabulate(
-        sorted(table, key=lambda item: float(item[1][1:]), reverse=True)
+        sorted(
+            table,
+            key=lambda item: float(item[1][1:]),  # type: ignore
+            reverse=True)
     )
 
 

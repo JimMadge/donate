@@ -12,6 +12,7 @@ pyxdg = "*"
 pyyaml = "*"
 tabulate = "*"
 typer = "^0.3.2"
+mypy = "^0.812"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
