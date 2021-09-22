@@ -1,7 +1,7 @@
 # Donate
 
 ![CI](https://github.com/JimMadge/donate/workflows/CI/badge.svg)
-[![codecov](https://codecov.io/gh/JimMadge/donate/branch/master/graph/badge.svg)](https://codecov.io/gh/JimMadge/donate)
+[![codecov](https://codecov.io/gh/JimMadge/donate/branch/main/graph/badge.svg?token=FMWS9RGDC2)](https://codecov.io/gh/JimMadge/donate)
 
 Generate donations to projects you want to support according to a distribution
 you control.
