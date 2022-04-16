@@ -1,6 +1,6 @@
 from .configuration import parse_config, Configuration
 from .donee import Donee
-from .logs import update_log
+from .ledger import update_log
 from .maths import split_decimal, single_donation, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)

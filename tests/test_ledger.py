@@ -1,7 +1,7 @@
 """Test log functions."""
 from datetime import date
 import donate
-from donate.logs import _log_path, update_log
+from donate.ledger import _log_path, update_log
 import pytest
 
 
@@ -31,8 +31,8 @@ def mock_date():
 
 
 def test_update_log(monkeypatch, mock_log_path, mock_date, donations):
-    monkeypatch.setattr(donate.logs, "_log_path", mock_log_path)
-    monkeypatch.setattr(donate.logs, "date", mock_date)
+    monkeypatch.setattr(donate.ledger, "_log_path", mock_log_path)
+    monkeypatch.setattr(donate.ledger, "date", mock_date)
 
     update_log(donations, "£", False)
 
@@ -51,8 +51,8 @@ def test_update_log(monkeypatch, mock_log_path, mock_date, donations):
 
 
 def test_update_log_decimal(monkeypatch, mock_log_path, mock_date, donations):
-    monkeypatch.setattr(donate.logs, "_log_path", mock_log_path)
-    monkeypatch.setattr(donate.logs, "date", mock_date)
+    monkeypatch.setattr(donate.ledger, "_log_path", mock_log_path)
+    monkeypatch.setattr(donate.ledger, "date", mock_date)
 
     update_log(donations, "$", True)
 
