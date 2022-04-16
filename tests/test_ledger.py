@@ -1,23 +1,16 @@
 """Test log functions."""
 from datetime import date
 import donate
-from donate.ledger import _log_path, update_log
+from donate.ledger import Ledger
 import pytest
 
 
-def test_log_path():
-    log_path = _log_path()
-    path_string = str(log_path.absolute())
+def test_xdg_ledger_path():
+    path = Ledger.xdg_ledger_path()
+    path_string = str(path.absolute())
 
-    assert path_string.split("/")[-1] == "donation_log.csv"
+    assert path_string.split("/")[-1] == "ledger.db"
     assert path_string.split("/")[-2] == "donate"
-
-
-@pytest.fixture
-def mock_log_path(tmp_path):
-    def _log_path():
-        return tmp_path / "donation_log.csv"
-    return _log_path
 
 
 @pytest.fixture
@@ -30,41 +23,25 @@ def mock_date():
     return MyDate()
 
 
-def test_update_log(monkeypatch, mock_log_path, mock_date, donations):
-    monkeypatch.setattr(donate.ledger, "_log_path", mock_log_path)
+def test_update_log(monkeypatch, mock_date, donations):
     monkeypatch.setattr(donate.ledger, "date", mock_date)
 
-    update_log(donations, "£", False)
+    # Create ledger in memory
+    ledger = Ledger(ledger_path=":memory:")
 
-    with open(mock_log_path(), "r") as csvfile:
-        log_lines = csvfile.readlines()
+    # Add trial donations to ledger
+    ledger.add(donations, "£", True)
 
-    assert "1990-09-11" in log_lines[0]
-    assert "Favourite distro" in log_lines[0]
-    assert "£,100" in log_lines[0]
-    assert "1990-09-11" in log_lines[1]
-    assert "Favourite software" in log_lines[1]
-    assert "£,50" in log_lines[1]
-    assert "1990-09-11" in log_lines[2]
-    assert "Podcast 1" in log_lines[2]
-    assert "£,10" in log_lines[2]
+    # Get all rows from ledger
+    with ledger.con as con:
+        rows = con.execute("select * from ledger").fetchall()
 
-
-def test_update_log_decimal(monkeypatch, mock_log_path, mock_date, donations):
-    monkeypatch.setattr(donate.ledger, "_log_path", mock_log_path)
-    monkeypatch.setattr(donate.ledger, "date", mock_date)
-
-    update_log(donations, "$", True)
-
-    with open(mock_log_path(), "r") as csvfile:
-        log_lines = csvfile.readlines()
-
-    assert "1990-09-11" in log_lines[0]
-    assert "Favourite distro" in log_lines[0]
-    assert "$,1.0" in log_lines[0]
-    assert "1990-09-11" in log_lines[1]
-    assert "Favourite software" in log_lines[1]
-    assert "$,0.5" in log_lines[1]
-    assert "1990-09-11" in log_lines[2]
-    assert "Podcast 1" in log_lines[2]
-    assert "$,0.1" in log_lines[2]
+    # Check ledger entries match match trial donations
+    # The first column is a unique id and is discarded
+    assert rows[0][1:] == (date(1990, 9, 11), 'Favourite distro', '£', True,
+                           100)
+    assert rows[1][1:] == (date(1990, 9, 11), 'Favourite software', '£', True,
+                           50)
+    assert rows[2][1:] == (date(1990, 9, 11), 'Podcast 1', '£', True,
+                           10)
+    assert len(rows) == 3

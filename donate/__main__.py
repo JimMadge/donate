@@ -1,6 +1,6 @@
 from .configuration import parse_config, Configuration
 from .donee import Donee
-from .ledger import update_log
+from .ledger import Ledger
 from .maths import split_decimal, single_donation, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
@@ -75,7 +75,8 @@ def generate(
     update_last_donation()
 
     # Append donations to log
-    update_log(individual_donations, config.currency_symbol,
+    ledger = Ledger()
+    ledger.add(individual_donations, config.currency_symbol,
                config.decimal_currency)
 
 
