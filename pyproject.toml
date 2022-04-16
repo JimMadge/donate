@@ -6,18 +6,18 @@ authors = ["Jim Madge <jmmadge@gmail.com>"]
 license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 pydantic = "*"
+python-dateutil = "*"
 pyxdg = "*"
 pyyaml = "*"
 tabulate = "*"
-typer = "^0.3.2"
-mypy = "^0.812"
+typer = "*"
+mypy = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
 pytest-cov = "*"
-python-dateutil = "*"
 
 [tool.poetry.scripts]
 donate = "donate.__main__:main"
