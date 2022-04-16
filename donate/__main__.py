@@ -1,6 +1,5 @@
 from .configuration import parse_config, Configuration
 from .donee import Donee
-from .ledger import update_ledger, ledger_stats
 from .logs import update_log
 from .maths import split_decimal, single_donation, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
@@ -78,17 +77,6 @@ def generate(
     # Append donations to log
     update_log(individual_donations, config.currency_symbol,
                config.decimal_currency)
-
-    # Update ledger
-    update_ledger(individual_donations)
-
-
-@app.command(help="Print some statistics about previous donations.")
-def stats(config_path: Optional[Path] = config_path_option) -> None:
-    config = get_config(check_config_path(config_path))
-
-    typer.echo(ledger_stats(config.currency_symbol, config.decimal_currency))
-    typer.Exit()
 
 
 @app.command(
