@@ -7,6 +7,13 @@ from typing import Optional
 from xdg import BaseDirectory  # type: ignore
 
 
+def _convert_boolean(boolean: int) -> bool:
+    return bool(boolean)
+
+
+sqlite3.register_converter("boolean", _convert_boolean)
+
+
 class Ledger:
     def __init__(self, ledger_path: Optional[Path] = None):
         if ledger_path:
@@ -32,6 +39,10 @@ class Ledger:
                              " decimal boolean,"
                              " amount int)")
 
+    @staticmethod
+    def xdg_ledger_path() -> Path:
+        return Path(BaseDirectory.save_data_path("donate")) / "ledger.db"
+
     def add(self, donations: Counter[Donee], currency_symbol: str,
             decimal_currency: bool) -> None:
         """Add donation records to the ledger"""
@@ -54,6 +65,13 @@ class Ledger:
                 rows
             )
 
-    @staticmethod
-    def xdg_ledger_path() -> Path:
-        return Path(BaseDirectory.save_data_path("donate")) / "ledger.db"
+    def all_entries(self) -> list[tuple[str]]:
+        """Get all ledger entries"""
+        with self.con:
+            entries = self.con.execute(
+                "select "
+                "date, name, currency, decimal, amount "
+                "from ledger"
+            )
+
+        return list(entries)

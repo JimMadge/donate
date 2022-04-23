@@ -1,8 +1,13 @@
 """Test log functions."""
 from datetime import date
 import donate
-from donate.ledger import Ledger
+from donate.ledger import Ledger, _convert_boolean
 import pytest
+
+
+def test_convert_boolen():
+    assert _convert_boolean(1)
+    assert not _convert_boolean(0)
 
 
 def test_xdg_ledger_path():
@@ -23,7 +28,8 @@ def mock_date():
     return MyDate()
 
 
-def test_update_log(monkeypatch, mock_date, donations):
+@pytest.fixture
+def example_ledger(monkeypatch, mock_date, donations):
     monkeypatch.setattr(donate.ledger, "date", mock_date)
 
     # Create ledger in memory
@@ -32,8 +38,12 @@ def test_update_log(monkeypatch, mock_date, donations):
     # Add trial donations to ledger
     ledger.add(donations, "£", True)
 
+    return ledger
+
+
+def test_add(example_ledger):
     # Get all rows from ledger
-    with ledger.con as con:
+    with example_ledger.con as con:
         rows = con.execute("select * from ledger").fetchall()
 
     # Check ledger entries match match trial donations
@@ -45,3 +55,25 @@ def test_update_log(monkeypatch, mock_date, donations):
     assert rows[2][1:] == (date(1990, 9, 11), 'Podcast 1', '£', True,
                            10)
     assert len(rows) == 3
+
+
+def test_all_entries(example_ledger):
+    entries = example_ledger.all_entries()
+
+    print(entries)
+    print([elem for elem in entries])
+
+    # Check entry types
+    types = (date, str, str, bool, int)
+    assert type(entries) == list
+    assert type(entries[0]) == tuple
+    for a, b in zip(entries[0], types):
+        assert type(a) == b
+
+    # Check entry values
+    assert entries[0] == (date(1990, 9, 11), 'Favourite distro', '£', True,
+                          100)
+    assert entries[1] == (date(1990, 9, 11), 'Favourite software', '£', True,
+                          50)
+    assert entries[2] == (date(1990, 9, 11), 'Podcast 1', '£', True, 10)
+    assert len(entries) == 3
