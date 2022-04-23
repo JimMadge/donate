@@ -57,11 +57,12 @@ def test_add(example_ledger):
     assert len(rows) == 3
 
 
-def test_all_entries(example_ledger):
-    entries = example_ledger.all_entries()
+def test_len(example_ledger):
+    assert len(example_ledger) == 3
 
-    print(entries)
-    print([elem for elem in entries])
+
+def test_all_entries(example_ledger):
+    entries = example_ledger[:]
 
     # Check entry types
     types = (date, str, str, bool, int)
@@ -77,3 +78,24 @@ def test_all_entries(example_ledger):
                           50)
     assert entries[2] == (date(1990, 9, 11), 'Podcast 1', '£', True, 10)
     assert len(entries) == 3
+
+
+def test_first_entry(example_ledger):
+    entry = example_ledger[0]
+
+    types = (date, str, str, bool, int)
+    assert type(entry) == tuple
+    for a, b in zip(entry, types):
+        assert type(a) == b
+
+    assert entry == (date(1990, 9, 11), 'Favourite distro', '£', True, 100)
+
+
+def test_out_of_index(example_ledger):
+    with pytest.raises(IndexError):
+        example_ledger[10]
+
+
+def test_invalid_key(example_ledger):
+    with pytest.raises(TypeError):
+        example_ledger["hello"]

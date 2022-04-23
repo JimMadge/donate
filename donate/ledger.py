@@ -3,7 +3,7 @@ from collections import Counter
 from datetime import date
 from pathlib import Path
 import sqlite3
-from typing import Optional
+from typing import Optional, Union
 from xdg import BaseDirectory  # type: ignore
 
 
@@ -65,13 +65,22 @@ class Ledger:
                 rows
             )
 
-    def all_entries(self) -> list[tuple[str]]:
-        """Get all ledger entries"""
+    def __len__(self) -> int:
+        """Count number of entries"""
+        with self.con:
+            length = self.con.execute("select count(*) from ledger")
+
+        return int(length.fetchone()[0])
+
+    def __getitem__(
+        self, key: Union[int, slice]
+    ) -> tuple[date, str, str, bool, int]:
+        """Access entries by index or a slice"""
         with self.con:
             entries = self.con.execute(
                 "select "
                 "date, name, currency, decimal, amount "
                 "from ledger"
-            )
+            ).fetchall()
 
-        return list(entries)
+        return entries[key]
