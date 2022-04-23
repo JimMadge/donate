@@ -23,13 +23,14 @@ class Ledger:
         )
 
         # Initialise database
-        self.con.execute("create table if not exists ledger"
-                         " (id integer primary key,"
-                         " date date,"
-                         " name text,"
-                         " currency text,"
-                         " decimal boolean,"
-                         " amount int)")
+        with self.con:
+            self.con.execute("create table if not exists ledger"
+                             " (id integer primary key,"
+                             " date date,"
+                             " name text,"
+                             " currency text,"
+                             " decimal boolean,"
+                             " amount int)")
 
     def add(self, donations: Counter[Donee], currency_symbol: str,
             decimal_currency: bool) -> None:
