@@ -13,11 +13,13 @@ pyxdg = "*"
 pyyaml = "*"
 tabulate = "*"
 typer = "*"
-mypy = "*"
 
 [tool.poetry.dev-dependencies]
+mypy = "*"
 pytest = "*"
 pytest-cov = "*"
+types-pyyaml = "*"
+types-tabulate = "*"
 
 [tool.poetry.scripts]
 donate = "donate.__main__:main"
