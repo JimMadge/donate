@@ -76,8 +76,8 @@ def generate(
 
     # Append donations to log
     ledger = Ledger()
-    ledger.add(individual_donations, config.currency_symbol,
-               config.decimal_currency)
+    ledger.append(individual_donations, config.currency_symbol,
+                  config.decimal_currency)
 
 
 @app.command(

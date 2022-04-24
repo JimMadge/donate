@@ -36,12 +36,12 @@ def example_ledger(monkeypatch, mock_date, donations):
     ledger = Ledger(ledger_path=":memory:")
 
     # Add trial donations to ledger
-    ledger.add(donations, "£", True)
+    ledger.append(donations, "£", True)
 
     return ledger
 
 
-def test_add(example_ledger):
+def test_append(example_ledger):
     # Get all rows from ledger
     with example_ledger.con as con:
         rows = con.execute("select * from ledger").fetchall()

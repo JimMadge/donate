@@ -43,8 +43,8 @@ class Ledger:
     def xdg_ledger_path() -> Path:
         return Path(BaseDirectory.save_data_path("donate")) / "ledger.db"
 
-    def add(self, donations: Counter[Donee], currency_symbol: str,
-            decimal_currency: bool) -> None:
+    def append(self, donations: Counter[Donee], currency_symbol: str,
+               decimal_currency: bool) -> None:
         """Add donation records to the ledger"""
         donation_date = date.today()
 
