@@ -1,15 +1,15 @@
-from .configuration import parse_config, Configuration
+from .configuration import Configuration
 from .donee import Donee
 from .ledger import Ledger
 from .maths import split_decimal, single_donation, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
+from datetime import date
 from json import dumps as json_dumps
 from pathlib import Path
 from tabulate import tabulate
 import typer
 from typing import Optional
-from xdg import BaseDirectory  # type: ignore
 from yaml import dump as yaml_dump
 
 
@@ -41,7 +41,7 @@ def generate(
         )
     )
 ) -> None:
-    config = get_config(check_config_path(config_path))
+    config = Configuration.from_file(config_path)
 
     # Create instance of schedule object
     if ad_hoc:
@@ -90,7 +90,7 @@ def means(
     total_donation: int = typer.Argument(..., help="total donation"),
     config_path: Optional[Path] = config_path_option
 ) -> None:
-    config = get_config(check_config_path(config_path))
+    config = Configuration.from_file(config_path)
 
     typer.echo(
         means_summary(config.donees, total_donation, config.currency_symbol)
@@ -127,28 +127,10 @@ def ledger(
                       canonical=False)
         )
     else:
-        typer.echo(tabulate(entries))
-
-
-def get_config(config_path: Path) -> Configuration:
-    with open(config_path, "r") as config_text:
-        config = parse_config(config_text.read())
-    return config
-
-
-def check_config_path(path: Optional[Path]) -> Path:
-    if path is None:
-        try:
-            path = (
-                BaseDirectory.load_first_config("donate") + "/config.yaml"
-            )
-        except TypeError:
-            print("No configuration file specified and no file at "
-                  f"{BaseDirectory.xdg_config_home + '/config.yaml'}")
-            typer.Exit()
-            exit()  # mypy doesn't know typer.Exit() will terminate
-
-    return path
+        if isinstance(entries, list):
+            typer.echo(tabulate(entries))
+        elif isinstance(entries, tuple):
+            typer.echo(tabulate([entries]))
 
 
 def format_donations(donations: dict[Donee, int], currency_symbol: str,

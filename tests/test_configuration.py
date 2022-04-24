@@ -1,9 +1,17 @@
-from donate.configuration import parse_config
+from donate.configuration import Configuration
 from donate.donee import Donee
 from textwrap import dedent
 from pydantic import ValidationError
 import pytest
 import yaml
+
+
+def test_xdg_config_path():
+    path = Configuration.xdg_config_path()
+    path_string = str(path.absolute())
+
+    assert path_string.split("/")[-1] == "config.yaml"
+    assert path_string.split("/")[-2] == "donate"
 
 
 class TestParseConfig:
@@ -34,7 +42,7 @@ class TestParseConfig:
     )
 
     def test_parse(self):
-        config = parse_config(self.yaml_string)
+        config = Configuration.from_str(self.yaml_string)
         assert config.total_donation == 20
         assert len(config.donees) == 2
 
@@ -45,12 +53,12 @@ class TestParseConfig:
     def test_parse_without_cloader(self, monkeypatch):
         monkeypatch.delattr("yaml.CLoader")
 
-        config = parse_config(self.yaml_string)
+        config = Configuration.from_str(self.yaml_string)
         assert config.total_donation == 20
         assert len(config.donees) == 2
 
     def test_donees(self):
-        config = parse_config(self.yaml_string)
+        config = Configuration.from_str(self.yaml_string)
         assert all(isinstance(item, Donee) for item in config.donees)
 
         expected_donee = Donee(
@@ -72,19 +80,19 @@ class TestParseConfig:
     def test_no_decimal_currency(self):
         yaml_string = self.yaml_string.replace("decimal_currency: true", "")
 
-        config = parse_config(yaml_string)
+        config = Configuration.from_str(yaml_string)
         assert config.decimal_currency is False
 
     def test_no_currency_symbol(self):
         yaml_string = self.yaml_string.replace("currency_symbol: £", "")
 
-        config = parse_config(yaml_string)
+        config = Configuration.from_str(yaml_string)
         assert config.currency_symbol == "£"
 
     def test_no_schedule(self):
         yaml_string = self.yaml_string.replace("schedule: ad hoc", "")
 
-        config = parse_config(yaml_string)
+        config = Configuration.from_str(yaml_string)
         assert config.schedule == "ad hoc"
 
     def test_monthly_schedule(self):
@@ -92,7 +100,7 @@ class TestParseConfig:
             "schedule: ad hoc", "schedule: monthly"
         )
 
-        config = parse_config(yaml_string)
+        config = Configuration.from_str(yaml_string)
         assert config.schedule == "monthly"
 
     def test_invalid_schedule(self):
@@ -100,5 +108,5 @@ class TestParseConfig:
                                                "schedule: occasional")
 
         with pytest.raises(ValidationError) as e:
-            parse_config(yaml_string)
+            Configuration.from_str(yaml_string)
             assert "Schedule 'occasional' is not valid" in str(e.value)

@@ -1,8 +1,10 @@
 from .donee import Donee
 from .schedule import schedule_map
-from typing import Any, KeysView
+from typing import Any, KeysView, Optional, Type, TypeVar
+from pathlib import Path
 from pydantic import BaseModel, Field, validator
 from yaml import load
+from xdg import BaseDirectory  # type: ignore
 
 
 class Weights(BaseModel):
@@ -19,6 +21,9 @@ class Weights(BaseModel):
 
     def keys(self) -> KeysView[str]:
         return self.weights.keys()
+
+
+T = TypeVar("T", bound="Configuration")
 
 
 class Configuration(BaseModel):
@@ -38,27 +43,38 @@ class Configuration(BaseModel):
             raise ValueError(f"Schedule '{v}' is not valid")
         return v
 
+    @staticmethod
+    def xdg_config_path() -> Path:
+        return Path(BaseDirectory.load_first_config("donate") + "/config.yaml")
 
-def parse_config(config: str) -> Configuration:
-    try:
-        from yaml import CLoader as Loader
-    except ImportError:
-        from yaml import Loader  # type: ignore
+    @classmethod
+    def from_file(cls: Type[T], config_path: Optional[Path]) -> T:
+        if not config_path:
+            config_path = cls.xdg_config_path()
 
-    config_dict = load(config, Loader)
-    return parse_config_dict(config_dict)
+        with open(config_path, "r") as config_file:
+            config = config_file.read()
 
+        return cls.from_str(config)
 
-def parse_config_dict(config: dict[str, Any]) -> Configuration:
-    weights = Weights(weights=config["weights"])
+    @classmethod
+    def from_str(cls: Type[T], config: str) -> T:
+        try:
+            from yaml import CLoader as Loader
+        except ImportError:
+            from yaml import Loader  # type: ignore
 
-    # Convert named weights to their numerical value
-    for donee in config["donees"]:
-        if isinstance(donee["weight"], str):
-            weight_string = donee["weight"]
-            assert weight_string in weights.keys()
-            donee["weight"] = weights[weight_string]
+        return cls.from_dict(load(config, Loader))
 
-    configuration = Configuration(**config)
+    @classmethod
+    def from_dict(cls: Type[T], config: dict[str, Any]) -> T:
+        weights = Weights(weights=config["weights"])
 
-    return configuration
+        # Convert named weights to their numerical value
+        for donee in config["donees"]:
+            if isinstance(donee["weight"], str):
+                weight_string = donee["weight"]
+                assert weight_string in weights.keys()
+                donee["weight"] = weights[weight_string]
+
+        return cls(**config)
