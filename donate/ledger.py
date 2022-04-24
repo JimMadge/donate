@@ -3,15 +3,17 @@ from collections import Counter
 from datetime import date
 from pathlib import Path
 import sqlite3
-from typing import Optional, Union
+from typing import Any, Optional, Union
 from xdg import BaseDirectory  # type: ignore
 
 
-def _convert_boolean(boolean: int) -> bool:
+def _convert_boolean(boolean: bytes) -> Any:
     return bool(boolean)
 
 
 sqlite3.register_converter("boolean", _convert_boolean)
+
+Entry = tuple[date, str, str, str, bool, int]
 
 
 class Ledger:
@@ -76,7 +78,7 @@ class Ledger:
 
     def __getitem__(
         self, key: Union[int, slice]
-    ) -> tuple[date, str, str, bool, int]:
+    ) -> Union[Entry, list[Entry]]:
         """Access entries by index or a slice"""
         with self.con:
             entries = self.con.execute(
