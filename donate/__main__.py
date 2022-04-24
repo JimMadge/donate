@@ -4,11 +4,13 @@ from .ledger import Ledger
 from .maths import split_decimal, single_donation, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
+from json import dumps as json_dumps
 from pathlib import Path
 from tabulate import tabulate
 import typer
 from typing import Optional
 from xdg import BaseDirectory  # type: ignore
+from yaml import dump as yaml_dump
 
 
 app = typer.Typer()
@@ -94,6 +96,38 @@ def means(
         means_summary(config.donees, total_donation, config.currency_symbol)
     )
     typer.Exit()
+
+
+@app.command(
+    help=("Print the donation history from the donation ledger")
+)
+def ledger(
+    json: bool = typer.Option(
+        False,
+        "--json",
+        help="Print history in JSON format"
+    ),
+    yaml: bool = typer.Option(
+        False,
+        "--yaml",
+        help="Print history in YAML format"
+    )
+) -> None:
+    ledger = Ledger()
+
+    entries = ledger[:]
+
+    if json:
+        typer.echo(
+            json_dumps(entries, indent=4, ensure_ascii=False, default=str)
+        )
+    elif yaml:
+        typer.echo(
+            yaml_dump(entries, default_flow_style=False, allow_unicode=True,
+                      canonical=False)
+        )
+    else:
+        typer.echo(tabulate(entries))
 
 
 def get_config(config_path: Path) -> Configuration:
