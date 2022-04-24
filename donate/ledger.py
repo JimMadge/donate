@@ -35,6 +35,7 @@ class Ledger:
                              " (id integer primary key,"
                              " date date,"
                              " name text,"
+                             " category text,"
                              " currency text,"
                              " decimal boolean,"
                              " amount int)")
@@ -51,6 +52,7 @@ class Ledger:
         rows = [
             (donation_date,
              donee.name,
+             donee.category,
              currency_symbol,
              decimal_currency,
              amount)
@@ -60,8 +62,8 @@ class Ledger:
         with self.con:
             self.con.executemany(
                 "insert into "
-                "ledger (date, name, currency, decimal, amount) "
-                "values (?, ?, ?, ?, ?)",
+                "ledger (date, name, category, currency, decimal, amount) "
+                "values (?, ?, ?, ?, ?, ?)",
                 rows
             )
 
@@ -79,7 +81,7 @@ class Ledger:
         with self.con:
             entries = self.con.execute(
                 "select "
-                "date, name, currency, decimal, amount "
+                "date, name, category, currency, decimal, amount "
                 "from ledger"
             ).fetchall()
 

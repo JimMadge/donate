@@ -48,12 +48,12 @@ def test_append(example_ledger):
 
     # Check ledger entries match match trial donations
     # The first column is a unique id and is discarded
-    assert rows[0][1:] == (date(1990, 9, 11), 'Favourite distro', '£', True,
-                           100)
-    assert rows[1][1:] == (date(1990, 9, 11), 'Favourite software', '£', True,
-                           50)
-    assert rows[2][1:] == (date(1990, 9, 11), 'Podcast 1', '£', True,
-                           10)
+    assert rows[0][1:] == (date(1990, 9, 11), 'Favourite distro',
+                           'distribution', '£', True, 100)
+    assert rows[1][1:] == (date(1990, 9, 11), 'Favourite software', 'software',
+                           '£', True, 50)
+    assert rows[2][1:] == (date(1990, 9, 11), 'Podcast 1', 'podcast', '£',
+                           True, 10)
     assert len(rows) == 3
 
 
@@ -65,30 +65,32 @@ def test_all_entries(example_ledger):
     entries = example_ledger[:]
 
     # Check entry types
-    types = (date, str, str, bool, int)
+    types = (date, str, str, str, bool, int)
     assert type(entries) == list
     assert type(entries[0]) == tuple
     for a, b in zip(entries[0], types):
         assert type(a) == b
 
     # Check entry values
-    assert entries[0] == (date(1990, 9, 11), 'Favourite distro', '£', True,
-                          100)
-    assert entries[1] == (date(1990, 9, 11), 'Favourite software', '£', True,
-                          50)
-    assert entries[2] == (date(1990, 9, 11), 'Podcast 1', '£', True, 10)
+    assert entries[0] == (date(1990, 9, 11), 'Favourite distro',
+                          'distribution', '£', True, 100)
+    assert entries[1] == (date(1990, 9, 11), 'Favourite software',
+                          'software', '£', True, 50)
+    assert entries[2] == (date(1990, 9, 11), 'Podcast 1', 'podcast', '£', True,
+                          10)
     assert len(entries) == 3
 
 
 def test_first_entry(example_ledger):
     entry = example_ledger[0]
 
-    types = (date, str, str, bool, int)
+    types = (date, str, str, str, bool, int)
     assert type(entry) == tuple
     for a, b in zip(entry, types):
         assert type(a) == b
 
-    assert entry == (date(1990, 9, 11), 'Favourite distro', '£', True, 100)
+    assert entry == (date(1990, 9, 11), 'Favourite distro', 'distribution',
+                     '£', True, 100)
 
 
 def test_out_of_index(example_ledger):
