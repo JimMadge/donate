@@ -3,15 +3,32 @@ from donate.donee import Donee
 from textwrap import dedent
 from pydantic import ValidationError
 import pytest
+from xdg import BaseDirectory
 import yaml
 
 
-def test_xdg_config_path():
+def test_xdg_config_path(monkeypatch):
+    def mock_load_first_config(name): return f"/var/donate_test/{name}"
+
+    monkeypatch.setattr(BaseDirectory, "load_first_config",
+                        mock_load_first_config)
+
     path = Configuration.xdg_config_path()
     path_string = str(path.absolute())
 
     assert path_string.split("/")[-1] == "config.yaml"
     assert path_string.split("/")[-2] == "donate"
+
+
+def test_no_xdg_config_path(monkeypatch):
+    def mock_load_first_config(name): return None
+
+    monkeypatch.setattr(BaseDirectory, "load_first_config",
+                        mock_load_first_config)
+
+    with pytest.raises(FileNotFoundError) as e:
+        Configuration.xdg_config_path()
+        assert "No configuration found" in str(e.value)
 
 
 class TestParseConfig:

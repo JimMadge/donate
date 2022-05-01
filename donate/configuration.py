@@ -45,7 +45,10 @@ class Configuration(BaseModel):
 
     @staticmethod
     def xdg_config_path() -> Path:
-        return Path(BaseDirectory.load_first_config("donate") + "/config.yaml")
+        if directory := BaseDirectory.load_first_config("donate"):
+            return Path(directory) / "config.yaml"
+        else:
+            raise FileNotFoundError("No configuration found")
 
     @classmethod
     def from_file(cls: Type[T], config_path: Optional[Path]) -> T:
