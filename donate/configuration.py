@@ -74,7 +74,14 @@ class Configuration(BaseModel):
         for donee in config["donees"]:
             if isinstance(donee["weight"], str):
                 weight_string = donee["weight"]
-                assert weight_string in weights.keys()
+
+                # Ensure weight has been declared
+                if weight_string not in weights.keys():
+                    raise ValueError(
+                        f"Weight '{weight_string}' of donee '{donee['name']}'"
+                        " not defined"
+                    )
+
                 donee["weight"] = weights[weight_string]
 
         return cls(**config)

@@ -110,3 +110,14 @@ class TestParseConfig:
         with pytest.raises(ValidationError) as e:
             Configuration.from_str(yaml_string)
             assert "Schedule 'occasional' is not valid" in str(e.value)
+
+    def test_invalid_weight_name(self):
+        yaml_string = self.yaml_string.replace("weight: critical",
+                                               "weight: really big")
+
+        with pytest.raises(ValueError) as e:
+            Configuration.from_str(yaml_string)
+            assert (
+                "Weight 'really big' of donee 'Favourite distro' not defined"
+                in str(e.value)
+            )
