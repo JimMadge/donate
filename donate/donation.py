@@ -1,4 +1,3 @@
-"""Mathematical and statistical operations."""
 from .donee import Donee
 from collections import Counter, defaultdict
 from random import choices
@@ -30,7 +29,7 @@ def normalised_weights(donees: list[Donee]) -> list[float]:
 def single_donation(donees: list[Donee], total_donation: int, split: int,
                     decimal_currency: bool = False) -> Counter[Donee]:
     """Generate a single donation."""
-    # When using a decimal currency allow spliting donations into hundreths
+    # When using a decimal currency allow splitting donations into hundredths
     if decimal_currency:
         total_donation *= 100
 

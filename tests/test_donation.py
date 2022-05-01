@@ -1,6 +1,7 @@
 import donate
-from donate.maths import (weights, normalised_weights, single_donation, _means,
-                          donee_means, category_means, means_summary)
+from donate.donation import (weights, normalised_weights, single_donation,
+                             _means, donee_means, category_means,
+                             means_summary)
 import pytest
 import re
 
@@ -61,7 +62,7 @@ class TestSingleDonation:
         # element
         def mock_choices(population, weights, *, k=1):
             return [population[0]]*k
-        monkeypatch.setattr(donate.maths, "choices", mock_choices)
+        monkeypatch.setattr(donate.donation, "choices", mock_choices)
 
         individual_donations = single_donation(donees, 20, 4)
         assert sum(individual_donations.values()) == 20

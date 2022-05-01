@@ -18,6 +18,8 @@ Entry = tuple[date, str, str, str, bool, int]
 
 
 class Ledger(Sequence[Entry]):
+    """A collection of donations backed by an sqlite database"""
+
     def __init__(self, ledger_path: Optional[Path] = None):
         if ledger_path:
             self.path = ledger_path
@@ -61,7 +63,7 @@ class Ledger(Sequence[Entry]):
     def __getitem__(
         self, index: Union[int, slice]
     ) -> Union[Entry, list[Entry]]:
-        """Access entries by index or a slice"""
+        """Get entries by index or a slice"""
         with self.con:
             entries = self.con.execute(
                 "select "
@@ -73,6 +75,7 @@ class Ledger(Sequence[Entry]):
 
     @staticmethod
     def xdg_ledger_path() -> Path:
+        """Return XDG location of the ledger database"""
         return Path(BaseDirectory.save_data_path("donate")) / "ledger.db"
 
     def append(self, donations: Counter[Donee], currency_symbol: str,

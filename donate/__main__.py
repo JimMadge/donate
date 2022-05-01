@@ -1,7 +1,7 @@
 from .configuration import Configuration
 from .donee import Donee
 from .ledger import Ledger
-from .maths import split_decimal, single_donation, means_summary
+from .donation import split_decimal, single_donation, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
 from json import dumps as json_dumps
