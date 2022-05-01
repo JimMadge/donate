@@ -4,7 +4,6 @@ from .ledger import Ledger
 from .maths import split_decimal, single_donation, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
-from datetime import date
 from json import dumps as json_dumps
 from pathlib import Path
 from tabulate import tabulate
