@@ -1,5 +1,5 @@
 import donate
-from donate.donation import (weights, normalised_weights, single_donation,
+from donate.donation import (weights, normalised_weights, create_donations,
                              _means, donee_means, category_means,
                              means_summary)
 import pytest
@@ -33,38 +33,38 @@ def test_share(example_normalised_weights, number, share):
 
 class TestSingleDonation:
     def test_single_split(self, donees):
-        individual_donations = single_donation(donees, 20, 1)
+        individual_donations = create_donations(donees, 20, 1)
         assert sum(individual_donations.values()) == 20
         assert len(individual_donations) == 1
 
     def test_single_split_decimal(self, donees):
-        individual_donations = single_donation(donees, 20, 1, True)
+        individual_donations = create_donations(donees, 20, 1, True)
         assert sum(individual_donations.values()) == 2000
         assert len(individual_donations) == 1
 
     def test_multiple_split(self, donees):
-        individual_donations = single_donation(donees, 20, 4)
+        individual_donations = create_donations(donees, 20, 4)
         assert sum(individual_donations.values()) == 20
         assert len(individual_donations) <= 4
 
     def test_multiple_split_decimal(self, donees):
-        individual_donations = single_donation(donees, 20, 4, True)
+        individual_donations = create_donations(donees, 20, 4, True)
         assert sum(individual_donations.values()) == 2000
         assert len(individual_donations) <= 4
 
     def test_non_divisable(self, donees):
         with pytest.raises(ValueError) as e:
-            single_donation(donees, 10, 3)
+            create_donations(donees, 10, 3)
         assert f"The donation split {3}" in str(e.value)
 
-    def test_single_donation_output(self, donees, monkeypatch):
+    def test_create_donations_output(self, donees, monkeypatch):
         # Create mock choices function which just returns 'k' of the first
         # element
         def mock_choices(population, weights, *, k=1):
             return [population[0]]*k
         monkeypatch.setattr(donate.donation, "choices", mock_choices)
 
-        individual_donations = single_donation(donees, 20, 4)
+        individual_donations = create_donations(donees, 20, 4)
         assert sum(individual_donations.values()) == 20
         assert len(individual_donations) == 1
         for donee in individual_donations:

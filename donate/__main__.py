@@ -1,7 +1,7 @@
 from .configuration import Configuration
 from .donee import Donee
 from .ledger import Ledger
-from .donation import split_decimal, single_donation, means_summary
+from .donation import split_decimal, create_donations, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
 from json import dumps as json_dumps
@@ -59,14 +59,14 @@ def generate(
             print(f"{due_donations} donations due")
 
     # Get individual donations
-    individual_donations = single_donation(
+    individual_donations = create_donations(
         config.donees,
         config.total_donation * due_donations,
         config.split * due_donations,
         config.decimal_currency
     )
-    print(format_donations(individual_donations, config.currency_symbol,
-                           config.decimal_currency))
+    typer.echo(format_donations(individual_donations, config.currency_symbol,
+                                config.decimal_currency))
 
     # Return before updating any files if this is a dry run
     if dry_run:
@@ -97,9 +97,7 @@ def means(
     typer.Exit()
 
 
-@app.command(
-    help=("Print the donation history from the donation ledger")
-)
+@app.command(help=("Print the donation history from the donation ledger"))
 def ledger(
     json: bool = typer.Option(
         False,
@@ -126,10 +124,7 @@ def ledger(
                       canonical=False)
         )
     else:
-        if isinstance(entries, list):
-            typer.echo(tabulate(entries))
-        elif isinstance(entries, tuple):
-            typer.echo(tabulate([entries]))
+        typer.echo(tabulate(entries))
 
 
 def format_donations(donations: dict[Donee, int], currency_symbol: str,

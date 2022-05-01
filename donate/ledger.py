@@ -1,5 +1,4 @@
 from .donee import Donee
-from collections import Counter
 from collections.abc import Sequence
 from datetime import date
 from pathlib import Path
@@ -78,7 +77,7 @@ class Ledger(Sequence[Entry]):
         """Return XDG location of the ledger database"""
         return Path(BaseDirectory.save_data_path("donate")) / "ledger.db"
 
-    def append(self, donations: Counter[Donee], currency_symbol: str,
+    def append(self, donations: dict[Donee, int], currency_symbol: str,
                decimal_currency: bool) -> None:
         """Add donation records to the ledger"""
         donation_date = date.today()

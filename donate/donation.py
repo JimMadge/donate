@@ -4,31 +4,9 @@ from random import choices
 from tabulate import tabulate
 
 
-def split_decimal(amount: int) -> tuple[int, int]:
-    """Split a decimal currency into who an hundreths."""
-    whole = amount // 100
-    hundreths = amount % 100
-    return whole, hundreths
-
-
-def weights(donees: list[Donee]) -> list[float]:
-    """Get weights from donees."""
-    return [donee.weight for donee in donees]
-
-
-def normalised_weights(donees: list[Donee]) -> list[float]:
-    """Calculate the normalised weights of each donee."""
-
-    n_weights = weights(donees)
-    total = sum(n_weights)
-    n_weights = [weight / total for weight in n_weights]
-
-    return n_weights
-
-
-def single_donation(donees: list[Donee], total_donation: int, split: int,
-                    decimal_currency: bool = False) -> Counter[Donee]:
-    """Generate a single donation."""
+def create_donations(donees: list[Donee], total_donation: int, split: int,
+                     decimal_currency: bool = False) -> dict[Donee, int]:
+    """Generate a set of donations from `total_donation` split `split` ways."""
     # When using a decimal currency allow splitting donations into hundredths
     if decimal_currency:
         total_donation *= 100
@@ -42,17 +20,44 @@ def single_donation(donees: list[Donee], total_donation: int, split: int,
 
     individual_donation = total_donation // split
 
-    selected = choices(
+    # Choose donees to donate to, duplicates are possible
+    split_donations = choices(
         donees,
         weights=weights(donees),
         k=split
         )
 
-    individual_donations: Counter[Donee] = Counter()
-    for donee in selected:
-        individual_donations[donee] += individual_donation
+    # Count number of donations to each donee
+    n_donations = Counter(split_donations)
 
-    return individual_donations
+    # Combine individual donations into total donation for each donee
+    donations: dict[Donee, int] = {}
+    for donee, occurances in n_donations.items():
+        donations[donee] = individual_donation * occurances
+
+    return donations
+
+
+def split_decimal(amount: int) -> tuple[int, int]:
+    """Split a decimal currency into who an hundredths."""
+    whole = amount // 100
+    hundreths = amount % 100
+    return whole, hundreths
+
+
+def weights(donees: list[Donee]) -> list[float]:
+    """Get the weight of each donees."""
+    return [donee.weight for donee in donees]
+
+
+def normalised_weights(donees: list[Donee]) -> list[float]:
+    """Calculate the normalised weight of each donee."""
+
+    n_weights = weights(donees)
+    total = sum(n_weights)
+    n_weights = [weight / total for weight in n_weights]
+
+    return n_weights
 
 
 def _means(donees: list[Donee], total_donation: int) -> list[float]:
