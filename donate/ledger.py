@@ -99,3 +99,25 @@ class Ledger(Sequence[Entry]):
                 "values (?, ?, ?, ?, ?, ?)",
                 rows
             )
+
+
+DictEntry = dict[str, Union[date, str, str, str, bool, int]]
+
+
+@overload
+def dictify(entries: Entry) -> DictEntry:
+    ...
+
+
+@overload
+def dictify(entries: list[Entry]) -> list[DictEntry]:
+    ...
+
+
+def dictify(entries: Entry | list[Entry]) -> DictEntry | list[DictEntry]:
+    keys = ("date", "donee", "category", "currency", "decimal", "amount")
+    match entries:
+        case tuple():
+            return dict(zip(keys, entries))
+        case list():
+            return [dict(zip(keys, entry)) for entry in entries]

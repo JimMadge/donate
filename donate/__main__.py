@@ -1,6 +1,6 @@
 from .configuration import Configuration
 from .donee import Donee
-from .ledger import Ledger
+from .ledger import Ledger, dictify
 from .donation import split_decimal, create_donations, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
@@ -112,7 +112,7 @@ def ledger(
     )
 ) -> None:
     ledger = Ledger()
-    entries = ledger[:]
+    entries = dictify(ledger[:])
 
     match out_format:
         case Format.json:
@@ -125,7 +125,7 @@ def ledger(
                 canonical=False
             ))
         case _:
-            typer.echo(tabulate(entries))
+            typer.echo(tabulate(entries, headers="keys"))
 
 
 def format_donations(donations: dict[Donee, int], currency_symbol: str,
