@@ -4,6 +4,7 @@ from .ledger import Ledger
 from .donation import split_decimal, create_donations, means_summary
 from .schedule import (schedule_map, Schedule, AdHoc, get_last_donation,
                        update_last_donation)
+from enum import Enum
 from json import dumps as json_dumps
 from pathlib import Path
 from tabulate import tabulate
@@ -81,10 +82,10 @@ def generate(
                   config.decimal_currency)
 
 
-@app.command(
-    help=("Print the mean donation received by each donee and donee category"
-          " from a total donation of MEANS")
-)
+@app.command(help=(
+    "Print the mean donation received by each donee and donee category from a"
+    " total donation of MEANS"
+))
 def means(
     total_donation: int = typer.Argument(..., help="total donation"),
     config_path: Optional[Path] = config_path_option
@@ -97,34 +98,34 @@ def means(
     typer.Exit()
 
 
+class Format(Enum):
+    json = "json"
+    yaml = "yaml"
+
+
 @app.command(help=("Print the donation history from the donation ledger"))
 def ledger(
-    json: bool = typer.Option(
-        False,
-        "--json",
-        help="Print history in JSON format"
-    ),
-    yaml: bool = typer.Option(
-        False,
-        "--yaml",
-        help="Print history in YAML format"
+    out_format: Format = typer.Option(
+        None,
+        "--format", "-f",
+        help="How to format donation history."
     )
 ) -> None:
     ledger = Ledger()
-
     entries = ledger[:]
 
-    if json:
-        typer.echo(
-            json_dumps(entries, indent=4, ensure_ascii=False, default=str)
-        )
-    elif yaml:
-        typer.echo(
-            yaml_dump(entries, default_flow_style=False, allow_unicode=True,
-                      canonical=False)
-        )
-    else:
-        typer.echo(tabulate(entries))
+    match out_format:
+        case Format.json:
+            typer.echo(json_dumps(
+                entries, indent=4, ensure_ascii=False, default=str
+            ))
+        case Format.yaml:
+            typer.echo(yaml_dump(
+                entries, default_flow_style=False, allow_unicode=True,
+                canonical=False
+            ))
+        case _:
+            typer.echo(tabulate(entries))
 
 
 def format_donations(donations: dict[Donee, int], currency_symbol: str,
